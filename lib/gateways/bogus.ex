@@ -1,15 +1,7 @@
 defmodule Cashier.Gateways.Bogus do
-  use GenServer
+  use Cashier.Gateways.Base, name: :bogus
 
-  def start_link(opts) do
-    GenServer.start_link(__MODULE__, opts, name: :bogus)
-  end
-
-  def init(opts) do
-    {:ok, opts}
-  end
-
-  def handle_call({:purchase}, _from, state) do
-    {:reply, {:ok, "from bogus"}, state}
+  def purchase do
+    {:ok, "from bogus"}
   end
 end

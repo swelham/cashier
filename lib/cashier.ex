@@ -10,7 +10,7 @@ defmodule Cashier do
 
   def purchase(opts) do
     gateway = opts[:gateway] || default_gateway
-IO.inspect default_gateway
+
     call(gateway, {:purchase})
   end
 
