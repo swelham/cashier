@@ -14,7 +14,7 @@ defmodule Cashier.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger],
+    [applications: [:logger, :httpoison],
      mod: {Cashier, []}]
   end
 
@@ -28,6 +28,13 @@ defmodule Cashier.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+      {:poison, "~> 3.0"},
+      {:httpoison, "~> 0.10.0"},
+
+      # test deps
+      # using bypass master as this hasn't had a release in a while
+      {:bypass, git: "https://github.com/PSPDFKit-labs/bypass.git", only: :test}
+    ]
   end
 end
