@@ -33,7 +33,8 @@ defmodule Cashier.Gateways.PayPal do
     state
   end
 
-  defp url(%{config: config}, path), do: "#{config[:url]}#{path}"
+  defp url(%{config: config}, path),
+    do: "#{config[:url]}#{path}"
 
   defp put_access_token(token, opts),
     do: Map.put(opts, :access_token, token)
