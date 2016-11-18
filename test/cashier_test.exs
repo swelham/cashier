@@ -10,7 +10,7 @@ defmodule CashierTest do
   test "purchase/0 should call into default gateway" do
     result = Cashier.purchase()
 
-    assert result == {:ok, "from bogus"} 
+    assert result == {:ok, "from dummy_gateway"} 
   end
 
   test "purchase/1 should call into a specified gateway", %{gateway: gateway} do

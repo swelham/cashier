@@ -1,6 +1,6 @@
 use Mix.Config
 
 config :cashier, :cashier,
-  default_gateway: :bogus
+  default_gateway: :dummy
   
-config :cashier, :bogus, []
+config :cashier, :dummy, []
