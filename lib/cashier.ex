@@ -9,16 +9,45 @@ defmodule Cashier do
     do: authorize(default_opts)
 
   def authorize(opts) do
-    resolve_gateway(opts)
-      |> call({:authorize})
+    opts
+    |> resolve_gateway
+    |> call({:authorize})
+  end
+
+  def capture(),
+    do: capture(default_opts)
+
+  def capture(opts) do
+    opts
+    |> resolve_gateway
+    |> call({:capture})
   end
 
   def purchase(),
     do: purchase(default_opts)
 
   def purchase(opts) do
-    resolve_gateway(opts)
-      |> call({:purchase})
+    opts
+    |> resolve_gateway
+    |> call({:purchase})
+  end
+  
+  def refund(),
+    do: refund(default_opts)
+
+  def refund(opts) do
+    opts
+    |> resolve_gateway
+    |> call({:refund})
+  end
+  
+  def void(),
+    do: void(default_opts)
+
+  def void(opts) do
+    opts
+    |> resolve_gateway
+    |> call({:void})
   end
 
   defp call(nil, _args),
