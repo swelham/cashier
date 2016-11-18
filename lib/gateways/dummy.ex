@@ -1,7 +1,8 @@
 defmodule Cashier.Gateways.Dummy do
   use Cashier.Gateways.Base, name: :dummy
 
-  def purchase do
-    {:ok, "from dummy_gateway"}
-  end
+  def authorize,  do: respond
+  def purchase,   do: respond
+
+  defp respond, do: {:ok, "from dummy_gateway"}
 end

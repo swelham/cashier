@@ -7,6 +7,18 @@ defmodule CashierTest do
     {:ok, %{gateway: pid}}
   end
 
+  test "authorize/0 should call into default gateway" do
+    result = Cashier.authorize()
+
+    assert result == {:ok, "from dummy_gateway"}
+  end
+
+  test "authorize/1 should call into a specified gateway", %{gateway: gateway} do
+    result = Cashier.authorize([gateway: gateway])
+    
+    assert result == {:ok, "from test_gateway"}
+  end
+
   test "purchase/0 should call into default gateway" do
     result = Cashier.purchase()
 
