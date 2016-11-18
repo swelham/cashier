@@ -2,7 +2,8 @@ defmodule Cashier.GatewaySupervisor do
   use Supervisor
 
   @gateways [
-    {:dummy, Cashier.Gateways.Dummy}
+    {:dummy, Cashier.Gateways.Dummy},
+    {:paypal, Cashier.Gateways.PayPal}
   ]
 
   def start_link do
