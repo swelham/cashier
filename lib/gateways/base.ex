@@ -9,36 +9,36 @@ defmodule Cashier.Gateways.Base do
       end
 
       def handle_call({:authorize}, _from, state),
-        do: {:reply, authorize(), state}
+        do: {:reply, authorize(state), state}
 
       def handle_call({:capture}, _from, state),
-        do: {:reply, capture(), state}
+        do: {:reply, capture(state), state}
 
       def handle_call({:purchase}, _from, state),
-        do: {:reply, purchase(), state}
+        do: {:reply, purchase(state), state}
       
       def handle_call({:refund}, _from, state),
-        do: {:reply, refund(), state}
+        do: {:reply, refund(state), state}
       
       def handle_call({:void}, _from, state),
-        do: {:reply, void(), state}
+        do: {:reply, void(state), state}
 
       # overridable functions
       def init(opts), do: {:ok, opts}
       
-      def authorize,  do: :not_implemented
-      def capture,    do: :not_implemented
-      def purchase,   do: :not_implemented
-      def refund,     do: :not_implemented
-      def void,       do: :not_implemented
+      def authorize(state),  do: :not_implemented
+      def capture(state),    do: :not_implemented
+      def purchase(state),   do: :not_implemented
+      def refund(state),     do: :not_implemented
+      def void(state),       do: :not_implemented
 
       defoverridable [
         init: 1,
-        authorize: 0,
-        capture: 0,
-        purchase: 0,
-        refund: 0,
-        void: 0
+        authorize: 1,
+        capture: 1,
+        purchase: 1,
+        refund: 1,
+        void: 1
       ]
     end
   end

@@ -29,8 +29,8 @@ defmodule Cashier.Gateways.PayPal do
     end
   end
 
-  def purchase(opts) do
-    opts
+  def purchase(state) do
+    state
   end
 
   defp url(%{config: config}, path), do: "#{config[:url]}#{path}"
