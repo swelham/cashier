@@ -1,6 +1,8 @@
 defmodule Cashier.Gateways.PayPalTest do
   use ExUnit.Case, async: true
 
+  import Cashier.TestMacros
+
   alias Bypass
   alias Cashier.Gateways.PayPal, as: Gateway
 
@@ -10,9 +12,10 @@ defmodule Cashier.Gateways.PayPalTest do
     opts = %{
       config: %{
         url: "http://localhost:#{bypass.port}",
+        access_token: "some.token",
         client_id: "client_id",
         client_secret: "client_secret"
-        }
+      }
     }
 
     {:ok, opts: opts, bypass: bypass}
@@ -24,13 +27,14 @@ defmodule Cashier.Gateways.PayPalTest do
 
       assert "/oauth2/token" == conn.request_path
       assert "POST" == conn.method
-      assert Enum.member?(conn.req_headers, {"authorization", "Basic Y2xpZW50X2lkOmNsaWVudF9zZWNyZXQ="})
-      assert Enum.member?(conn.req_headers, {"content-type", "application/x-www-form-urlencoded"})
+      assert has_header(conn, {"authorization", "Basic Y2xpZW50X2lkOmNsaWVudF9zZWNyZXQ="})
+      assert has_header(conn, {"content-type", "application/x-www-form-urlencoded"})
       assert body == "grant_type=client_credentials"
       
       Plug.Conn.send_resp(conn, 200, "{\"access_token\": \"some_token\"}")
     end
 
+    opts = Map.drop(opts, [:access_token])
     {:ok, result} = Gateway.init(opts)
 
     assert result.access_token == "some_token"
@@ -41,6 +45,7 @@ defmodule Cashier.Gateways.PayPalTest do
       Plug.Conn.send_resp(conn, 201, "")
     end
 
+    opts = Map.drop(opts, [:access_token])
     {:stop, result} = Gateway.init(opts)
 
     assert result == "Unexpected status code (201) returned requesting the PayPal access_token"

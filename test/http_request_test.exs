@@ -1,5 +1,7 @@
 defmodule Cashier.HttpRequestTest do
   use ExUnit.Case
+
+  import Cashier.TestMacros
   
   alias Cashier.HttpRequest
   
@@ -60,7 +62,7 @@ defmodule Cashier.HttpRequestTest do
       assert "GET" == conn.method 
       assert "localhost" == conn.host 
       assert bypass.port == conn.port
-      assert Enum.member?(conn.req_headers, {"authorization", "Basic dXNlcjpwYXNz"})
+      assert has_header(conn, {"authorization", "Basic dXNlcjpwYXNz"})
 
       Plug.Conn.send_resp(conn, 200, "")
     end
@@ -78,7 +80,7 @@ defmodule Cashier.HttpRequestTest do
       assert "GET" == conn.method
       assert "localhost" == conn.host
       assert bypass.port == conn.port
-      assert Enum.member?(conn.req_headers, {"authorization", "bearer some_token"})
+      assert has_header(conn, {"authorization", "bearer some_token"})
 
       Plug.Conn.send_resp(conn, 200, "")
     end
@@ -98,7 +100,7 @@ defmodule Cashier.HttpRequestTest do
       assert "POST" == conn.method
       assert "localhost" == conn.host
       assert bypass.port == conn.port
-      assert Enum.member?(conn.req_headers, {"content-type", "application/x-www-form-urlencoded"})
+      assert has_header(conn, {"content-type", "application/x-www-form-urlencoded"})
       assert body == "abc=123"
 
       Plug.Conn.send_resp(conn, 200, "")
