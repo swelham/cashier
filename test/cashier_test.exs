@@ -31,14 +31,14 @@ defmodule CashierTest do
     assert result == {:ok, "capture from test_gateway"}
   end
 
-  test "purchase/0 should call into default gateway" do
-    result = Cashier.purchase()
+  test "purchase/2 should call into default gateway" do
+    result = Cashier.purchase(0, nil)
 
     assert result == {:ok, "purchase from dummy_gateway"} 
   end
 
-  test "purchase/1 should call into a specified gateway", %{gateway: gateway} do
-    result = Cashier.purchase([gateway: gateway])
+  test "purchase/3 should call into a specified gateway", %{gateway: gateway} do
+    result = Cashier.purchase(0, nil, [gateway: gateway])
 
     assert result == {:ok, "purchase from test_gateway"} 
   end
