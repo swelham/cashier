@@ -32,5 +32,5 @@ defmodule Cashier.GatewaySupervisor do
   end
 
   defp map_to_worker({gateway, config}),
-    do: worker(elem(gateway, 1), [%{config: config}])
+    do: worker(elem(gateway, 1), [config])
 end

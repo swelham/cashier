@@ -6,9 +6,8 @@ defmodule Cashier.Gateways.PayPal do
   alias Cashier.PaymentCard
 
   def init(opts) do
-    config = opts.config
     body = %{grant_type: "client_credentials"}
-    api_keys = {config[:client_id], config[:client_secret]}
+    api_keys = {opts[:client_id], opts[:client_secret]}
     
     request =
       HttpRequest.new(:post, url(opts, "/oauth2/token"))
@@ -22,7 +21,7 @@ defmodule Cashier.Gateways.PayPal do
           |> Poison.decode!
           |> Map.get("access_token")
           |> put_access_token(opts)
-        
+
         {:ok, opts}
       {:ok, %HTTPoison.Response{status_code: status_code}} ->
         {:stop, unexpected_status_error(status_code, "requesting the PayPal access_token")}
@@ -45,7 +44,7 @@ defmodule Cashier.Gateways.PayPal do
   end
 
   defp respond({:ok, %{status_code: 201, body: body}}),
-    do: {:ok, Poison.decode(body)}
+    do: Poison.decode(body)
 
   defp respond({:ok, %{status_code: status_code, body: body}}),
     do: {:error, unexpected_status_error(status_code, body)}
@@ -53,11 +52,11 @@ defmodule Cashier.Gateways.PayPal do
   defp respond({:error, reason}),
     do: {:error, reason}
 
-  defp url(%{config: config}, path),
+  defp url(config, path),
     do: "#{config[:url]}#{path}"
 
   defp put_access_token(token, opts),
-    do: Map.put(opts, :access_token, token)
+    do: Keyword.put(opts, :access_token, token)
 
   # TODO: improve error reporting
   defp unexpected_status_error(status_code, action),

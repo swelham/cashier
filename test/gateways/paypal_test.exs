@@ -12,19 +12,17 @@ defmodule Cashier.Gateways.PayPalTest do
   setup do
     bypass = Bypass.open
 
-    state = %{
-      config: %{
-        url: "http://localhost:#{bypass.port}",
-        access_token: "some.token",
-        client_id: "client_id",
-        client_secret: "client_secret"
-      }
-    }
+    config = [
+      url: "http://localhost:#{bypass.port}",
+      access_token: "some.token",
+      client_id: "client_id",
+      client_secret: "client_secret"
+    ]
 
-    {:ok, state: state, bypass: bypass}
+    {:ok, config: config, bypass: bypass}
   end
 
-  test "init/1 should put the PayPal access_token into state", %{state: state, bypass: bypass} do
+  test "init/1 should put the PayPal access_token into state", %{config: config, bypass: bypass} do
     Bypass.expect bypass, fn conn ->
       {:ok, body, _} = Plug.Conn.read_body(conn)
 
@@ -37,24 +35,24 @@ defmodule Cashier.Gateways.PayPalTest do
       Plug.Conn.send_resp(conn, 200, "{\"access_token\": \"some_token\"}")
     end
 
-    state = Map.drop(state, [:access_token])
-    {:ok, result} = Gateway.init(state)
+    config = Keyword.delete(config, :access_token)
+    {:ok, result} = Gateway.init(config)
 
-    assert result.access_token == "some_token"
+    assert result[:access_token] == "some_token"
   end
 
-  test "init/1 should stop the process when an unexpected status code is returned", %{state: state, bypass: bypass} do
+  test "init/1 should stop the process when an unexpected status code is returned", %{config: config, bypass: bypass} do
     Bypass.expect bypass, fn conn ->
       Plug.Conn.send_resp(conn, 201, "")
     end
 
-    state = Map.drop(state, [:access_token])
-    {:stop, result} = Gateway.init(state)
+    config = Keyword.delete(config, :access_token)
+    {:stop, result} = Gateway.init(config)
 
     assert result == "Unexpected status code (201) returned requesting the PayPal access_token"
   end
 
-  test "purchase/4 should successfully process a purchase request", %{state: state, bypass: bypass} do
+  test "purchase/4 should successfully process a purchase request", %{config: config, bypass: bypass} do
     Bypass.expect bypass, fn conn ->
       {:ok, body, _} = Plug.Conn.read_body(conn)
 
@@ -84,16 +82,16 @@ defmodule Cashier.Gateways.PayPalTest do
       postal_code: "10004"
     }
 
-    opts = default_opts(billing_address: address)
+    opts = default_opts ++ [billing_address: address]
 
-    {:ok, result} = Gateway.purchase(9.75, card, opts, state)
+    {:ok, result} = Gateway.purchase(9.75, card, opts, config)
 
     assert result["id"] == "PAY-123"
   end
 
-  defp default_opts(opts) do
+  defp default_opts do
     [
       currency: "USD"
-    ] ++ opts
+    ]
   end
 end
