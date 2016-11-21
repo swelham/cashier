@@ -39,8 +39,7 @@ defmodule Cashier.Gateways.PayPal do
       |> put_payer(card, opts)
       |> put_transactions(amount, opts)
 
-    request =
-      HttpRequest.new(:post, url(state, "/v1/payments/payment"))
+    HttpRequest.new(:post, url(state, "/v1/payments/payment"))
       |> HttpRequest.put_auth(:bearer, config.access_token)
       |> HttpRequest.put_body(req_data, :json)
       |> HttpRequest.send
@@ -50,7 +49,7 @@ defmodule Cashier.Gateways.PayPal do
   defp respond({:ok, %{status_code: 201, body: body}}),
     do: Poison.decode(body)
 
-  defp respond({:ok, %{status_code: status_code, body: body}}),
+  defp respond({:ok, %{status_code: status_code}}),
     do: {:error, unexpected_status_error(status_code)}
   
   defp respond({:error, reason}),
