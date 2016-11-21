@@ -53,13 +53,19 @@ defmodule Cashier do
   defp call(nil, _args),
     do: {:error, "A payment gateway was not specified"}
   defp call(gateway, args),
-    do: GenServer.call(gateway, args)
+    do: GenServer.call(gateway, args, gateway_timeout(gateway))
 
   defp resolve_gateway([gateway: gateway]), do: gateway
   defp resolve_gateway(_), do: default_gateway 
 
   defp default_opts, do: [gateway: default_gateway]
+
   defp default_gateway,
     do: Application.get_env(:cashier, :cashier)[:default_gateway]
+  
+  defp gateway_timeout(gateway),
+    do: Application.get_env(:cashier, gateway)[:timeout] || default_timeout
 
+  defp default_timeout,
+    do: Application.get_env(:cashier, :cashier)[:default_timeout] || 5000
 end
