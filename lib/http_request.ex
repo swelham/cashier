@@ -1,5 +1,5 @@
 defmodule Cashier.HttpRequest do
-  defstruct [:method, :url, :headers, :body, :auth_mode, :credentials]
+  defstruct [:method, :url, :headers, :body, :auth_mode, :credentials, :opts]
   
   alias Poison
   alias Cashier.HttpRequest
@@ -8,7 +8,8 @@ defmodule Cashier.HttpRequest do
     %HttpRequest{
       method: method,
       url: url,
-      headers: []
+      headers: [],
+      opts: []
     }
   end
   
@@ -33,28 +34,34 @@ defmodule Cashier.HttpRequest do
   end
   
   def send(request = %{method: :get}) do
+    opts = prepare_request_opts(request)
+
     HTTPoison.get(
       request.url,
       request.headers,
-      request.credentials || []
-    )
+      opts)
   end
 
   def send(request = %{auth_mode: :basic}) do
+    opts = prepare_request_opts(request)
+
     HTTPoison.request(
       request.method,
       request.url,
       request.body,
       request.headers,
-      request.credentials)
+      opts)
   end
   
   def send(request) do
+    opts = prepare_request_opts(request)
+
     HTTPoison.request(
       request.method,
       request.url,
       request.body,
-      request.headers)
+      request.headers,
+      opts)
   end
   
   defp put_header(request, header),
@@ -77,4 +84,24 @@ defmodule Cashier.HttpRequest do
   
   defp encode_body(_, params),
     do: params
+
+  defp prepare_request_opts(request) do
+    config = Application.get_env(:cashier, :cashier)
+
+    request.opts
+      |> put_proxy(config)
+      |> put_credentials(request)
+  end
+
+  defp put_proxy(opts, config) do
+    case config[:proxy] do
+      nil -> opts
+      proxy -> [proxy: proxy] ++ opts
+    end
+  end
+
+  defp put_credentials(opts, %{auth_mode: :basic, credentials: credentials}),
+    do: credentials ++ opts
+  defp put_credentials(opts, _),
+    do: opts
 end

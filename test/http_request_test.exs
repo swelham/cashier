@@ -17,7 +17,8 @@ defmodule Cashier.HttpRequestTest do
     assert request == %HttpRequest {
       method: :post,
       url: "http://example.com",
-      headers: []
+      headers: [],
+      opts: []
     }
   end
   
@@ -76,7 +77,7 @@ defmodule Cashier.HttpRequestTest do
   end
 
   test "send/1 should send GET request with bearer auth", %{bypass: bypass} do
-    Bypass.expect bypass, fn conn ->
+    Bypass.expect bypass, fn conn -> 
       assert "GET" == conn.method
       assert "localhost" == conn.host
       assert bypass.port == conn.port
