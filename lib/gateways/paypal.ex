@@ -25,32 +25,30 @@ defmodule Cashier.Gateways.PayPal do
         
         {:ok, opts}
       {:ok, %HTTPoison.Response{status_code: status_code}} ->
-        {:stop, unexpected_status_error(status_code)}
+        {:stop, unexpected_status_error(status_code, "requesting the PayPal access_token")}
       {:error, %HTTPoison.Error{reason: reason}} ->
         {:stop, reason}
     end
   end
 
   def purchase(amount, card, opts, state) do
-    config = state.config
-
     req_data = %{}
       |> put_intent(:sale)
       |> put_payer(card, opts)
       |> put_transactions(amount, opts)
-
+    
     HttpRequest.new(:post, url(state, "/v1/payments/payment"))
-      |> HttpRequest.put_auth(:bearer, config.access_token)
+      |> HttpRequest.put_auth(:bearer, state[:access_token])
       |> HttpRequest.put_body(req_data, :json)
       |> HttpRequest.send
       |> respond
   end
 
   defp respond({:ok, %{status_code: 201, body: body}}),
-    do: Poison.decode(body)
+    do: {:ok, Poison.decode(body)}
 
-  defp respond({:ok, %{status_code: status_code}}),
-    do: {:error, unexpected_status_error(status_code)}
+  defp respond({:ok, %{status_code: status_code, body: body}}),
+    do: {:error, unexpected_status_error(status_code, body)}
   
   defp respond({:error, reason}),
     do: {:error, reason}
@@ -61,8 +59,9 @@ defmodule Cashier.Gateways.PayPal do
   defp put_access_token(token, opts),
     do: Map.put(opts, :access_token, token)
 
-  defp unexpected_status_error(status_code),
-    do: "Unexpected status code (#{status_code}) returned requesting the PayPal access_token"
+  # TODO: improve error reporting
+  defp unexpected_status_error(status_code, action),
+    do: "Unexpected status code (#{status_code}) returned #{action}"
 
   defp put_intent(map, :sale),
     do: Map.put(map, :intent, "sale")
