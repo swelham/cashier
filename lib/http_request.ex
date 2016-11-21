@@ -89,14 +89,14 @@ defmodule Cashier.HttpRequest do
     config = Application.get_env(:cashier, :cashier)
 
     request.opts
-      |> put_proxy(config)
+      |> put_http_config(config)
       |> put_credentials(request)
   end
 
-  defp put_proxy(opts, config) do
-    case config[:proxy] do
+  defp put_http_config(opts, config) do
+    case config[:http] do
       nil -> opts
-      proxy -> [proxy: proxy] ++ opts
+      config -> config ++ opts
     end
   end
 
