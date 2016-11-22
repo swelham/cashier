@@ -52,7 +52,27 @@ defmodule Cashier.Gateways.PayPalTest do
     assert result == "Unexpected status code (201) returned requesting the PayPal access_token"
   end
 
-  test "purchase/4 should successfully process a purchase request", %{config: config, bypass: bypass} do
+  test "authorize/4 should successfully process a credit card authorization request", %{config: config, bypass: bypass} do
+    Bypass.expect bypass, fn conn ->
+      {:ok, body, _} = Plug.Conn.read_body(conn)
+
+      assert "POST" == conn.method
+      assert "/v1/payments/payment" == conn.request_path
+      assert has_header(conn, {"authorization", "bearer some.token"})
+      assert has_header(conn, {"content-type", "application/json"})
+      assert body == Fixtures.authorize_request
+
+      Plug.Conn.send_resp(conn, 201, "{\"id\":\"PAY-123\"}")
+    end
+
+    opts = default_opts ++ [billing_address: address]
+
+    {:ok, result} = Gateway.authorize(9.75, payment_card, opts, config)
+
+    assert result["id"] == "PAY-123"
+  end
+
+  test "purchase/4 should successfully process a credit card purchase request", %{config: config, bypass: bypass} do
     Bypass.expect bypass, fn conn ->
       {:ok, body, _} = Plug.Conn.read_body(conn)
 
@@ -65,26 +85,9 @@ defmodule Cashier.Gateways.PayPalTest do
       Plug.Conn.send_resp(conn, 201, "{\"id\":\"PAY-123\"}")
     end
 
-    card = %PaymentCard{
-      holder: {"John", "Smith"},
-      brand: "visa",
-      number: "1234567890123456",
-      expiry: {11, 2020},
-      cvv: "123"
-    }
-
-    address = %Address{
-      line1: "123",
-      line2: "Main",
-      city: "New York",
-      state: "New York",
-      country_code: "NY",
-      postal_code: "10004"
-    }
-
     opts = default_opts ++ [billing_address: address]
 
-    {:ok, result} = Gateway.purchase(9.75, card, opts, config)
+    {:ok, result} = Gateway.purchase(9.75, payment_card, opts, config)
 
     assert result["id"] == "PAY-123"
   end
@@ -93,5 +96,26 @@ defmodule Cashier.Gateways.PayPalTest do
     [
       currency: "USD"
     ]
+  end
+
+  defp payment_card do
+    %PaymentCard{
+      holder: {"John", "Smith"},
+      brand: "visa",
+      number: "1234567890123456",
+      expiry: {11, 2020},
+      cvv: "123"
+    }
+  end
+
+  defp address do
+    %Address{
+      line1: "123",
+      line2: "Main",
+      city: "New York",
+      state: "New York",
+      country_code: "NY",
+      postal_code: "10004"
+    }
   end
 end

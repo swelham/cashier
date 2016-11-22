@@ -8,8 +8,8 @@ defmodule Cashier.Gateways.Base do
         GenServer.start_link(__MODULE__, opts, name: unquote(opts[:name]))
       end
 
-      def handle_call({:authorize}, _from, state),
-        do: {:reply, authorize(state), state}
+      def handle_call({:authorize, amount, card, opts}, _from, state),
+        do: {:reply, authorize(amount, card, opts, state), state}
 
       def handle_call({:capture}, _from, state),
         do: {:reply, capture(state), state}
@@ -26,7 +26,7 @@ defmodule Cashier.Gateways.Base do
       # overridable functions
       def init(opts), do: {:ok, opts}
       
-      def authorize(state),
+      def authorize(amount, card, opts, state),
         do: :not_implemented
 
       def capture(state),
@@ -43,7 +43,7 @@ defmodule Cashier.Gateways.Base do
 
       defoverridable [
         init: 1,
-        authorize: 1,
+        authorize: 4,
         capture: 1,
         purchase: 4,
         refund: 1,

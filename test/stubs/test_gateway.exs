@@ -1,7 +1,7 @@
 defmodule Cashier.TestGateway do
   use Cashier.Gateways.Base, name: :test_gateway
 
-  def authorize(_),
+  def authorize(_, _, _, _),
     do: respond("authorize")
 
   def capture(_),

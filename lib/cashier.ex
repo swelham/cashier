@@ -5,13 +5,13 @@ defmodule Cashier do
     Cashier.GatewaySupervisor.start_link()
   end
 
-  def authorize(),
-    do: authorize(default_opts)
+  def authorize(amount, card),
+    do: authorize(amount, card, default_opts)
 
-  def authorize(opts) do
+  def authorize(amount, card, opts) do
     opts
     |> resolve_gateway
-    |> call({:authorize})
+    |> call({:authorize, amount, card, opts})
   end
 
   def capture(),

@@ -10,7 +10,7 @@ defmodule Cashier.Gateways.PayPal do
     api_keys = {opts[:client_id], opts[:client_secret]}
     
     request =
-      HttpRequest.new(:post, url(opts, "/oauth2/token"))
+      HttpRequest.new(:post, resolve_url(opts, "/oauth2/token"))
       |> HttpRequest.put_body(body, :url_encoded)
       |> HttpRequest.put_auth(:basic, api_keys)
 
@@ -30,15 +30,28 @@ defmodule Cashier.Gateways.PayPal do
     end
   end
 
+  def authorize(amount, card, opts, state) do
+    req_data = %{}
+      |> put_intent(:authorize)
+      |> put_payer(card, opts)
+      |> put_transactions(amount, opts)
+    
+    request("/v1/payments/payment", req_data, state)
+  end
+
   def purchase(amount, card, opts, state) do
     req_data = %{}
       |> put_intent(:sale)
       |> put_payer(card, opts)
       |> put_transactions(amount, opts)
     
-    HttpRequest.new(:post, url(state, "/v1/payments/payment"))
+    request("/v1/payments/payment", req_data, state)
+  end
+
+  defp request(url, data, state) do
+    HttpRequest.new(:post, resolve_url(state, url))
       |> HttpRequest.put_auth(:bearer, state[:access_token])
-      |> HttpRequest.put_body(req_data, :json)
+      |> HttpRequest.put_body(data, :json)
       |> HttpRequest.send
       |> respond
   end
@@ -52,7 +65,7 @@ defmodule Cashier.Gateways.PayPal do
   defp respond({:error, reason}),
     do: {:error, reason}
 
-  defp url(config, path),
+  defp resolve_url(config, path),
     do: "#{config[:url]}#{path}"
 
   defp put_access_token(token, opts),
@@ -64,6 +77,9 @@ defmodule Cashier.Gateways.PayPal do
 
   defp put_intent(map, :sale),
     do: Map.put(map, :intent, "sale")
+
+  defp put_intent(map, :authorize),
+    do: Map.put(map, :intent, "authorize")
     
   defp put_payer(map, card, opts) do
     payer = %{}

@@ -1,7 +1,7 @@
 defmodule Cashier.Gateways.Dummy do
   use Cashier.Gateways.Base, name: :dummy
 
-  def authorize(_),
+  def authorize(_, _, _, _),
     do: respond("authorize")
 
   def capture(_),
