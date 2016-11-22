@@ -39,6 +39,14 @@ defmodule Cashier.Gateways.PayPal do
     request("/v1/payments/payment", req_data, state)
   end
 
+  def capture(id, amount, opts, state) do
+    req_data = %{}
+      |> put_capture_amount(amount, opts)
+      |> put_final_capture(opts)
+
+    request("/v1/payments/authorization/#{id}/capture", req_data, state)
+  end
+
   def purchase(amount, card, opts, state) do
     req_data = %{}
       |> put_intent(:sale)
@@ -56,7 +64,7 @@ defmodule Cashier.Gateways.PayPal do
       |> respond
   end
 
-  defp respond({:ok, %{status_code: 201, body: body}}),
+  defp respond({:ok, %{status_code: status_code, body: body}}) when status_code in [200, 201],
     do: Poison.decode(body)
 
   defp respond({:ok, %{status_code: status_code, body: body}}),
@@ -139,5 +147,21 @@ defmodule Cashier.Gateways.PayPal do
     }
     
     Map.put(map, :transactions, [%{amount: amount_map}])
+  end
+
+  defp put_capture_amount(map, amount, opts) do
+    amount = %{
+      currency: opts[:currency],
+      total: amount
+    }
+
+    Map.put(map, :amount, amount)
+  end
+
+  defp put_final_capture(map, opts) do
+    case opts[:final_capture] do
+      true -> Map.put(map, :is_final_capture, true)
+      _ -> map 
+    end
   end
 end

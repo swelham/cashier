@@ -19,14 +19,14 @@ defmodule CashierTest do
     assert result == {:ok, "authorize from test_gateway"}
   end
 
-  test "capture/0 should call into default gateway" do
-    result = Cashier.capture()
+  test "capture/2 should call into default gateway" do
+    result = Cashier.capture(nil, 0)
 
     assert result == {:ok, "capture from dummy_gateway"}
   end
 
-  test "capture/1 should call into a specified gateway", %{gateway: gateway} do
-    result = Cashier.capture([gateway: gateway])
+  test "capture/3 should call into a specified gateway", %{gateway: gateway} do
+    result = Cashier.capture(nil, 0, [gateway: gateway])
     
     assert result == {:ok, "capture from test_gateway"}
   end

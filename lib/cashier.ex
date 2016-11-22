@@ -14,13 +14,13 @@ defmodule Cashier do
     |> call({:authorize, amount, card, opts})
   end
 
-  def capture(),
-    do: capture(default_opts)
+  def capture(id, amount),
+    do: capture(id, amount, default_opts)
 
-  def capture(opts) do
+  def capture(id, amount, opts) do
     opts
     |> resolve_gateway
-    |> call({:capture})
+    |> call({:capture, id, amount, opts})
   end
 
   def purchase(amount, card),

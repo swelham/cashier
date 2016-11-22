@@ -4,7 +4,7 @@ defmodule Cashier.Gateways.Dummy do
   def authorize(_, _, _, _),
     do: respond("authorize")
 
-  def capture(_),
+  def capture(_, _, _, _),
     do: respond("capture")
 
   def purchase(_, _, _, _),

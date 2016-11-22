@@ -10,6 +10,25 @@ defmodule Cashier.PayPalFixtures do
       transactions: transactions
     }
   end
+
+  def capture_request do
+    Poison.encode! %{
+      amount: %{
+        currency: "USD",
+        total: 9.75
+      }
+    }
+  end
+
+  def capture_final_request do
+    Poison.encode! %{
+      amount: %{
+        currency: "USD",
+        total: 9.75
+      },
+      is_final_capture: true
+    }
+  end
   
   def purchase_request do
     Poison.encode! %{

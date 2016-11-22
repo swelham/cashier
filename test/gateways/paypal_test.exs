@@ -72,6 +72,44 @@ defmodule Cashier.Gateways.PayPalTest do
     assert result["id"] == "PAY-123"
   end
 
+  test "capture/4 should successfully process a capture request", %{config: config, bypass: bypass} do
+    Bypass.expect bypass, fn conn ->
+      {:ok, body, _} = Plug.Conn.read_body(conn)
+
+      assert "POST" == conn.method
+      assert "/v1/payments/authorization/1234/capture" == conn.request_path
+      assert has_header(conn, {"authorization", "bearer some.token"})
+      assert has_header(conn, {"content-type", "application/json"})
+      assert body == Fixtures.capture_request
+
+      Plug.Conn.send_resp(conn, 200, "{\"id\":\"5678\"}")
+    end
+
+    {:ok, result} = Gateway.capture("1234", 9.75, default_opts, config)
+
+    assert result["id"] == "5678"
+  end
+
+  test "capture/4 should successfully process a final capture request ", %{config: config, bypass: bypass} do
+    Bypass.expect bypass, fn conn ->
+      {:ok, body, _} = Plug.Conn.read_body(conn)
+
+      assert "POST" == conn.method
+      assert "/v1/payments/authorization/1234/capture" == conn.request_path
+      assert has_header(conn, {"authorization", "bearer some.token"})
+      assert has_header(conn, {"content-type", "application/json"})
+      assert body == Fixtures.capture_final_request
+
+      Plug.Conn.send_resp(conn, 200, "{\"id\":\"5678\"}")
+    end
+
+    opts = [final_capture: true] ++ default_opts
+
+    {:ok, result} = Gateway.capture("1234", 9.75, opts, config)
+
+    assert result["id"] == "5678"
+  end
+
   test "purchase/4 should successfully process a credit card purchase request", %{config: config, bypass: bypass} do
     Bypass.expect bypass, fn conn ->
       {:ok, body, _} = Plug.Conn.read_body(conn)

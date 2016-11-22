@@ -11,8 +11,8 @@ defmodule Cashier.Gateways.Base do
       def handle_call({:authorize, amount, card, opts}, _from, state),
         do: {:reply, authorize(amount, card, opts, state), state}
 
-      def handle_call({:capture}, _from, state),
-        do: {:reply, capture(state), state}
+      def handle_call({:capture, id, amount, opts}, _from, state),
+        do: {:reply, capture(id, amount, opts, state), state}
 
       def handle_call({:purchase, amount, card, opts}, _from, state),
         do: {:reply, purchase(amount, card, opts, state), state}
@@ -29,7 +29,7 @@ defmodule Cashier.Gateways.Base do
       def authorize(amount, card, opts, state),
         do: :not_implemented
 
-      def capture(state),
+      def capture(id, amount, opts, state),
         do: :not_implemented
       
       def purchase(amount, card, opts, state),
@@ -44,7 +44,7 @@ defmodule Cashier.Gateways.Base do
       defoverridable [
         init: 1,
         authorize: 4,
-        capture: 1,
+        capture: 4,
         purchase: 4,
         refund: 1,
         void: 1

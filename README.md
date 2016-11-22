@@ -18,7 +18,7 @@ easy to use public API and configuration.
  
 * PayPal Gateway (REST API)
   - [x] Authorizations
-  - [ ] Captures
+  - [x] Captures
   - [x] Purchases
   - [ ] Refunds
   - [ ] Voids
