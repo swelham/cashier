@@ -14,19 +14,19 @@ easy to use public API and configuration.
 
 *This will be updated on completion of the first payment gateway*
 
-# Todo
+# Todo (short term)
  
 * PayPal Gateway (REST API)
-  - ~~Authorizations~~
-  - Captures
-  - ~~Purchases~~
-  - Refunds
-  - Voids
+  - [x] Authorizations
+  - [ ] Captures
+  - [x] Purchases
+  - [ ] Refunds
+  - [ ] Voids
 * Configuration
-  - ~~Default gateway~~
-  - Default currency
-  - ~~HTTP request options (passed into HTTPoison)~~
-  - Currecny based gateway routing
-  - ~~Load known gateways where configuration has been set~~
+  - [x] Default gateway
+  - [ ] Default currency
+  - [x] HTTP request options (passed into HTTPoison)
+  - [ ] Currecny based gateway routing
+  - [x] Load known gateways where configuration has been set
 * Gateway failover (pass the request to an alternative gateway on failure)
 * Gateway pooling
