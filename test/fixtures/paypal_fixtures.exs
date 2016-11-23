@@ -30,6 +30,15 @@ defmodule Cashier.PayPalFixtures do
     }
   end
   
+  def partial_refund_request do
+    Poison.encode! %{
+      amount: %{
+        currency: "USD",
+        total: 9.75
+      }
+    }
+  end
+
   def purchase_request do
     Poison.encode! %{
       intent: "sale",

@@ -56,8 +56,22 @@ defmodule Cashier.Gateways.PayPal do
     request("/v1/payments/payment", req_data, state)
   end
 
+  def refund(id, opts, state) do
+    req_data = case opts[:amount] do
+      nil -> %{}
+      amount -> %{
+        amount: %{
+          total: amount,
+          currency: opts[:currency]
+        }
+      }
+    end
+
+    request("/v1/payments/sale/#{id}/refund", req_data, state)
+  end
+
   def void(id, _opts, state) do
-    request("/v1/payments/authorization/#{id}/void", nil, state)
+    request("/v1/payments/authorization/#{id}/void", %{}, state)
   end
 
   defp request(url, data, state) do

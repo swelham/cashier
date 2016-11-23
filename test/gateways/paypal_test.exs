@@ -129,13 +129,56 @@ defmodule Cashier.Gateways.PayPalTest do
 
     assert result["id"] == "PAY-123"
   end
+  
+  test "refund/3 should successfully process a refund request", %{config: config, bypass: bypass} do
+    Bypass.expect bypass, fn conn ->
+      {:ok, body, _} = Plug.Conn.read_body(conn)
+
+      assert "POST" == conn.method
+      assert "/v1/payments/sale/1234/refund" == conn.request_path
+      assert has_header(conn, {"authorization", "bearer some.token"})
+      assert has_header(conn, {"content-type", "application/json"})
+      assert body == "{}"
+
+      Plug.Conn.send_resp(conn, 200, "{\"id\":\"5678\"}")
+    end
+
+    opts = default_opts
+
+    {:ok, result} = Gateway.refund("1234", opts, config)
+
+    assert result["id"] == "5678"
+  end
+
+  test "refund/3 should successfully process a partial refund request", %{config: config, bypass: bypass} do
+    Bypass.expect bypass, fn conn ->
+      {:ok, body, _} = Plug.Conn.read_body(conn)
+
+      assert "POST" == conn.method
+      assert "/v1/payments/sale/1234/refund" == conn.request_path
+      assert has_header(conn, {"authorization", "bearer some.token"})
+      assert has_header(conn, {"content-type", "application/json"})
+      assert body == Fixtures.partial_refund_request
+
+      Plug.Conn.send_resp(conn, 200, "{\"id\":\"5678\"}")
+    end
+
+    opts = [amount: 9.75] ++ default_opts
+
+    {:ok, result} = Gateway.refund("1234", opts, config)
+
+    assert result["id"] == "5678"
+  end
 
   test "void/3 should successfully process a void authorization request", %{config: config, bypass: bypass} do
     Bypass.expect bypass, fn conn ->
+      {:ok, body, _} = Plug.Conn.read_body(conn)
+
       assert "POST" == conn.method
       assert "/v1/payments/authorization/1234/void" == conn.request_path
       assert has_header(conn, {"authorization", "bearer some.token"})
       assert has_header(conn, {"content-type", "application/json"})
+      assert body == "{}"
 
       Plug.Conn.send_resp(conn, 200, "{\"id\":\"5678\"}")
     end

@@ -10,7 +10,7 @@ defmodule Cashier.TestGateway do
   def purchase(_, _, _, _),
     do: respond("purchase")
 
-  def refund(_),
+  def refund(_, _, _),
     do: respond("refund")
 
   def void(_, _, _),

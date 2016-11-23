@@ -43,14 +43,14 @@ defmodule CashierTest do
     assert result == {:ok, "purchase from test_gateway"} 
   end
 
-  test "refund/0 should call into default gateway" do
-    result = Cashier.refund()
+  test "refund/1 should call into default gateway" do
+    result = Cashier.refund(0)
 
     assert result == {:ok, "refund from dummy_gateway"} 
   end
 
-  test "refund/1 should call into a specified gateway", %{gateway: gateway} do
-    result = Cashier.refund([gateway: gateway])
+  test "refund/2 should call into a specified gateway", %{gateway: gateway} do
+    result = Cashier.refund(0, [gateway: gateway])
 
     assert result == {:ok, "refund from test_gateway"} 
   end

@@ -17,7 +17,7 @@ defmodule Cashier.HttpRequest do
     con_type = content_type(encoding)
     
     request
-      |> Map.put(:body, encode_body(encoding, params))
+      |> put_encoded_body(encoding, params)
       |> put_header(con_type)
   end
   
@@ -73,12 +73,15 @@ defmodule Cashier.HttpRequest do
   defp content_type(:json),
     do: {"content-type", "application/json"}
     
+  defp put_encoded_body(map, encoding, data),
+    do: Map.put(map, :body, encode_body(encoding, data))
+
   defp encode_body(:url_encoded, params) do
     params
       |> Enum.filter(fn {_k, v} -> v != nil end)
       |> URI.encode_query
   end
-  
+
   defp encode_body(:json, params),
     do: Poison.encode!(params)
   

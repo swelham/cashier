@@ -20,7 +20,7 @@ easy to use public API and configuration.
   - [x] Authorizations
   - [x] Captures
   - [x] Purchases
-  - [ ] Refunds
+  - [x] Refunds
   - [x] Voids
 * Configuration
   - [x] Default gateway
