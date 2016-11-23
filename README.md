@@ -24,9 +24,10 @@ easy to use public API and configuration.
   - [x] Voids
 * Configuration
   - [x] Default gateway
-  - [ ] Default currency
+  - [x] Default currency
   - [x] HTTP request options (passed into HTTPoison)
   - [ ] Currecny based gateway routing
   - [x] Load known gateways where configuration has been set
 * Gateway failover (pass the request to an alternative gateway on failure)
 * Gateway pooling
+* Documentation

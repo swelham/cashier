@@ -1,6 +1,9 @@
 use Mix.Config
 
 config :cashier, :cashier,
-  default_gateway: :dummy
+  defaults: [
+    gateway: :dummy,
+    currency: "USD"
+  ]
   
 config :cashier, :dummy, []

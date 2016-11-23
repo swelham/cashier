@@ -8,64 +8,71 @@ defmodule Cashier do
   def authorize(amount, card),
     do: authorize(amount, card, default_opts)
 
-  def authorize(amount, card, opts) do
-    opts
-    |> resolve_gateway
-    |> call({:authorize, amount, card, opts})
-  end
+  def authorize(amount, card, opts),
+    do: call(opts, {:authorize, amount, card})
 
   def capture(id, amount),
     do: capture(id, amount, default_opts)
 
-  def capture(id, amount, opts) do
-    opts
-    |> resolve_gateway
-    |> call({:capture, id, amount, opts})
-  end
+  def capture(id, amount, opts),
+    do: call(opts, {:capture, id, amount})
 
   def purchase(amount, card),
     do: purchase(amount, card, default_opts)
 
-  def purchase(amount, card, opts) do
-    opts
-    |> resolve_gateway
-    |> call({:purchase, amount, card, opts})
-  end
+  def purchase(amount, card, opts),
+    do: call(opts, {:purchase, amount, card})
   
   def refund(id),
     do: refund(id, default_opts)
 
-  def refund(id, opts) do
-    opts
-    |> resolve_gateway
-    |> call({:refund, id, opts})
-  end
+  def refund(id, opts),
+    do: call(opts, {:refund, id})
   
   def void(id),
     do: void(id, default_opts)
 
-  def void(id, opts) do
+  def void(id, opts),
+    do: call(opts, {:void, id})
+
+  defp call(opts, args) do
+    opts = merge_default_opts(opts)
+    args = Tuple.append(args, opts)
+
     opts
     |> resolve_gateway
-    |> call({:void, id, opts})
+    |> call_gateway(args)
   end
 
-  defp call(nil, _args),
+  defp call_gateway(nil, _args),
     do: {:error, "A payment gateway was not specified"}
-  defp call(gateway, args),
+  defp call_gateway(gateway, args),
     do: GenServer.call(gateway, args, gateway_timeout(gateway))
 
-  defp resolve_gateway([gateway: gateway]), do: gateway
-  defp resolve_gateway(_), do: default_gateway 
+  defp resolve_gateway(opts),
+    do: Keyword.get(opts, :gateway)
 
-  defp default_opts, do: [gateway: default_gateway]
-
-  defp default_gateway,
-    do: Application.get_env(:cashier, :cashier)[:default_gateway]
+  defp merge_default_opts(opts),
   
+    do: Keyword.merge(default_opts, opts)
+
+  defp default_opts do
+    [
+      gateway: get_default(:gateway),
+      currency: get_default(:currency)
+    ]
+  end
+
+  defp get_default(key) do
+    case Application.get_env(:cashier, :cashier)[:defaults] do
+      nil -> nil
+      defaults -> defaults[key]
+    end
+  end
+
   defp gateway_timeout(gateway),
     do: Application.get_env(:cashier, gateway)[:timeout] || default_timeout
 
   defp default_timeout,
-    do: Application.get_env(:cashier, :cashier)[:default_timeout] || 5000
+    do: get_default(:timeout) || 5000
 end
