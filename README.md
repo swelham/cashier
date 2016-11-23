@@ -21,7 +21,7 @@ easy to use public API and configuration.
   - [x] Captures
   - [x] Purchases
   - [ ] Refunds
-  - [ ] Voids
+  - [x] Voids
 * Configuration
   - [x] Default gateway
   - [ ] Default currency

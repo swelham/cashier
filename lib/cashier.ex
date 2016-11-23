@@ -41,13 +41,13 @@ defmodule Cashier do
     |> call({:refund})
   end
   
-  def void(),
-    do: void(default_opts)
+  def void(id),
+    do: void(id, default_opts)
 
-  def void(opts) do
+  def void(id, opts) do
     opts
     |> resolve_gateway
-    |> call({:void})
+    |> call({:void, id, opts})
   end
 
   defp call(nil, _args),

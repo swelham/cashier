@@ -13,7 +13,7 @@ defmodule Cashier.TestGateway do
   def refund(_),
     do: respond("refund")
 
-  def void(_),
+  def void(_, _, _),
     do: respond("void")
 
   defp respond(key), do: {:ok, "#{key} from test_gateway"}

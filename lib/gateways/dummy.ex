@@ -13,9 +13,8 @@ defmodule Cashier.Gateways.Dummy do
   def refund(_),
     do: respond("refund")
 
-  def void(_),
+  def void(_, _, _),
     do: respond("void")
-
 
   defp respond(key), do: {:ok, "#{key} from dummy_gateway"}
 end

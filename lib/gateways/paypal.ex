@@ -56,6 +56,10 @@ defmodule Cashier.Gateways.PayPal do
     request("/v1/payments/payment", req_data, state)
   end
 
+  def void(id, _opts, state) do
+    request("/v1/payments/authorization/#{id}/void", nil, state)
+  end
+
   defp request(url, data, state) do
     HttpRequest.new(:post, resolve_url(state, url))
       |> HttpRequest.put_auth(:bearer, state[:access_token])

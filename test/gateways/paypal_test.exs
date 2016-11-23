@@ -130,6 +130,21 @@ defmodule Cashier.Gateways.PayPalTest do
     assert result["id"] == "PAY-123"
   end
 
+  test "void/3 should successfully process a void authorization request", %{config: config, bypass: bypass} do
+    Bypass.expect bypass, fn conn ->
+      assert "POST" == conn.method
+      assert "/v1/payments/authorization/1234/void" == conn.request_path
+      assert has_header(conn, {"authorization", "bearer some.token"})
+      assert has_header(conn, {"content-type", "application/json"})
+
+      Plug.Conn.send_resp(conn, 200, "{\"id\":\"5678\"}")
+    end
+
+    {:ok, result} = Gateway.void("1234", [], config)
+
+    assert result["id"] == "5678"
+  end
+
   defp default_opts do
     [
       currency: "USD"

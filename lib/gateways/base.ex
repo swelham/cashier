@@ -20,8 +20,8 @@ defmodule Cashier.Gateways.Base do
       def handle_call({:refund}, _from, state),
         do: {:reply, refund(state), state}
       
-      def handle_call({:void}, _from, state),
-        do: {:reply, void(state), state}
+      def handle_call({:void, id, opts}, _from, state),
+        do: {:reply, void(id, opts, state), state}
 
       # overridable functions
       def init(opts), do: {:ok, opts}
@@ -38,7 +38,7 @@ defmodule Cashier.Gateways.Base do
       def refund(state),
         do: :not_implemented
 
-      def void(state),
+      def void(id, opts, state),
         do: :not_implemented
 
       defoverridable [
@@ -47,7 +47,7 @@ defmodule Cashier.Gateways.Base do
         capture: 4,
         purchase: 4,
         refund: 1,
-        void: 1
+        void: 3
       ]
     end
   end
