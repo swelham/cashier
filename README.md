@@ -22,6 +22,7 @@ easy to use public API and configuration.
   - [x] Purchases
   - [x] Refunds
   - [x] Voids
+  - [ ] Auto token refresh (this is needed for long running processes)
 * Configuration
   - [x] Default gateway
   - [x] Default currency
