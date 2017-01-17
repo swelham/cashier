@@ -30,8 +30,8 @@ easy to use public API and configuration.
   - [x] Load known gateways where configuration has been set
 * Gateway failover (pass the request to an alternative gateway on failure)
 * Gateway pooling
-  - Ability to configure the number of workers per pool
-  - When one worker fails attempt the request on another worker
-  - Config option to limit the number of attempts per request
+  - [ ] Ability to configure the number of workers per pool
+  - [ ] When one worker fails attempt the request on another worker
+  - [ ] Config option to limit the number of attempts per request
 * Documentation
 * Need improved error handling
