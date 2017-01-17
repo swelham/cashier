@@ -22,13 +22,16 @@ easy to use public API and configuration.
   - [x] Purchases
   - [x] Refunds
   - [x] Voids
-  - [ ] Auto token refresh (this is needed for long running processes)
 * Configuration
   - [x] Default gateway
   - [x] Default currency
   - [x] HTTP request options (passed into HTTPoison)
-  - [ ] Currecny based gateway routing
+  - [ ] Currency based gateway routing
   - [x] Load known gateways where configuration has been set
 * Gateway failover (pass the request to an alternative gateway on failure)
 * Gateway pooling
+  - Ability to configure the number of workers per pool
+  - When one worker fails attempt the request on another worker
+  - Config option to limit the number of attempts per request
 * Documentation
+* Need improved error handling
