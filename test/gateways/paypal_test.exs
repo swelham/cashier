@@ -52,6 +52,14 @@ defmodule Cashier.Gateways.PayPalTest do
     assert result == "Unexpected status code (201) returned requesting the PayPal access_token"
   end
 
+  test "the process should stop when an unauthorized status code is returned", %{config: config, bypass: bypass} do
+    Bypass.expect bypass, fn conn ->
+      Plug.Conn.send_resp(conn, 401, "")
+    end
+
+    {:stop, :unauthorized} = Gateway.void("1234", [], config)
+  end
+
   test "authorize/4 should successfully process a credit card authorization request", %{config: config, bypass: bypass} do
     Bypass.expect bypass, fn conn ->
       {:ok, body, _} = Plug.Conn.read_body(conn)
