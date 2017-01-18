@@ -14,24 +14,8 @@ easy to use public API and configuration.
 
 *This will be updated on completion of the first payment gateway*
 
-# Todo (short term)
- 
-* PayPal Gateway (REST API)
-  - [x] Authorizations
-  - [x] Captures
-  - [x] Purchases
-  - [x] Refunds
-  - [x] Voids
-* Configuration
-  - [x] Default gateway
-  - [x] Default currency
-  - [x] HTTP request options (passed into HTTPoison)
-  - [ ] Currency based gateway routing
-  - [x] Load known gateways where configuration has been set
-* Gateway failover (pass the request to an alternative gateway on failure)
-* Gateway pooling
-  - [ ] Ability to configure the number of workers per pool
-  - [ ] When one worker fails attempt the request on another worker
-  - [ ] Config option to limit the number of attempts per request
-* Documentation
-* Need improved error handling
+# Todo
+
+All current todo items are listed on the [issues page](https://github.com/swelham/cashier/issues).
+
+Please add any issues, suggestions or feature requests to this page.
