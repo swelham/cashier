@@ -26,7 +26,7 @@ defmodule Cashier.Gateways.PayPalTest do
     Bypass.expect bypass, fn conn ->
       {:ok, body, _} = Plug.Conn.read_body(conn)
 
-      assert "/oauth2/token" == conn.request_path
+      assert "/v1/oauth2/token" == conn.request_path
       assert "POST" == conn.method
       assert has_header(conn, {"authorization", "Basic Y2xpZW50X2lkOmNsaWVudF9zZWNyZXQ="})
       assert has_header(conn, {"content-type", "application/x-www-form-urlencoded"})

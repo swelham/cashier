@@ -10,7 +10,7 @@ defmodule Cashier.Gateways.PayPal do
     api_keys = {opts[:client_id], opts[:client_secret]}
     
     request =
-      HttpRequest.new(:post, resolve_url(opts, "/oauth2/token"))
+      HttpRequest.new(:post, resolve_url(opts, "/v1/oauth2/token"))
       |> HttpRequest.put_body(body, :url_encoded)
       |> HttpRequest.put_auth(:basic, api_keys)
 
