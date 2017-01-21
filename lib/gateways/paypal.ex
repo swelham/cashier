@@ -36,7 +36,7 @@ defmodule Cashier.Gateways.PayPal do
       |> put_payer(card, opts)
       |> put_transactions(amount, opts)
     
-    request("/v1/payments/payment", req_data, state)
+    request(:post, "/v1/payments/payment", req_data, state)
   end
 
   def capture(id, amount, opts, state) do
@@ -44,7 +44,7 @@ defmodule Cashier.Gateways.PayPal do
       |> put_capture_amount(amount, opts)
       |> put_final_capture(opts)
 
-    request("/v1/payments/authorization/#{id}/capture", req_data, state)
+    request(:post, "/v1/payments/authorization/#{id}/capture", req_data, state)
   end
 
   def purchase(amount, card, opts, state) do
@@ -53,7 +53,7 @@ defmodule Cashier.Gateways.PayPal do
       |> put_payer(card, opts)
       |> put_transactions(amount, opts)
     
-    request("/v1/payments/payment", req_data, state)
+    request(:post, "/v1/payments/payment", req_data, state)
   end
 
   def refund(id, opts, state) do
@@ -67,26 +67,47 @@ defmodule Cashier.Gateways.PayPal do
       }
     end
 
-    request("/v1/payments/sale/#{id}/refund", req_data, state)
+    request(:post, "/v1/payments/sale/#{id}/refund", req_data, state)
   end
 
   def store(card, opts, state) do
     req_data = build_credit_card(card, opts)
 
-    request("/v1/vault/credit-cards", req_data, state)
+    request(:post, "/v1/vault/credit-cards", req_data, state)
+  end
+
+  def unstore(id, _opts, state) do
+    request(:delete, "/v1/vault/credit-cards/#{id}", state)
   end
 
   def void(id, _opts, state) do
-    request("/v1/payments/authorization/#{id}/void", %{}, state)
+    request(:post, "/v1/payments/authorization/#{id}/void", %{}, state)
   end
 
-  defp request(url, data, state) do
-    HttpRequest.new(:post, resolve_url(state, url))
-      |> HttpRequest.put_auth(:bearer, state[:access_token])
+  defp request(:delete, url, state) do
+    build_request(:delete, url, state)
+      |> send
+  end
+
+  defp request(:post, url, data, state) do
+    build_request(:post, url, state)
       |> HttpRequest.put_body(data, :json)
+      |> send
+  end
+
+  defp build_request(method, url, state) do
+    HttpRequest.new(method, resolve_url(state, url))
+      |> HttpRequest.put_auth(:bearer, state[:access_token])
+  end
+
+  defp send(%HttpRequest{} = request) do
+    request
       |> HttpRequest.send
       |> respond
   end
+
+  defp respond({:ok, %{status_code: 204}}),
+    do: :ok
 
   defp respond({:ok, %{status_code: status_code, body: body}}) when status_code in [200, 201],
     do: Poison.decode(body)
