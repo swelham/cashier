@@ -29,6 +29,12 @@ defmodule Cashier do
   def refund(id, opts),
     do: call(opts, {:refund, id})
   
+  def store(card),
+    do: store(card, default_opts)
+
+  def store(card, opts),
+    do: call(opts, {:store, card})
+
   def void(id),
     do: void(id, default_opts)
 
@@ -53,7 +59,6 @@ defmodule Cashier do
     do: Keyword.get(opts, :gateway)
 
   defp merge_default_opts(opts),
-  
     do: Keyword.merge(default_opts, opts)
 
   defp default_opts do

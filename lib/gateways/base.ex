@@ -20,6 +20,9 @@ defmodule Cashier.Gateways.Base do
       def handle_call({:refund, id, opts}, _from, state),
         do: {:reply, refund(id, opts, state), state}
       
+      def handle_call({:store, card, opts}, _from, state),
+        do: {:reply, store(card, opts, state), state}
+
       def handle_call({:void, id, opts}, _from, state),
         do: {:reply, void(id, opts, state), state}
 
@@ -38,6 +41,9 @@ defmodule Cashier.Gateways.Base do
       def refund(id, opts, state),
         do: :not_implemented
 
+      def store(card, opts, state),
+        do: :not_implemented
+
       def void(id, opts, state),
         do: :not_implemented
 
@@ -47,6 +53,7 @@ defmodule Cashier.Gateways.Base do
         capture: 4,
         purchase: 4,
         refund: 3,
+        store: 3,
         void: 3
       ]
     end
