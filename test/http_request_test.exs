@@ -18,7 +18,8 @@ defmodule Cashier.HttpRequestTest do
       method: :post,
       url: "http://example.com",
       headers: [],
-      opts: []
+      opts: [],
+      body: ""
     }
   end
   

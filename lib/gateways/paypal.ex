@@ -36,7 +36,7 @@ defmodule Cashier.Gateways.PayPal do
       |> put_payer(card, opts)
       |> put_transactions(amount, opts)
     
-    request("/v1/payments/payment", req_data, state)
+    request(:post, "/v1/payments/payment", req_data, state)
   end
 
   def capture(id, amount, opts, state) do
@@ -44,7 +44,7 @@ defmodule Cashier.Gateways.PayPal do
       |> put_capture_amount(amount, opts)
       |> put_final_capture(opts)
 
-    request("/v1/payments/authorization/#{id}/capture", req_data, state)
+    request(:post, "/v1/payments/authorization/#{id}/capture", req_data, state)
   end
 
   def purchase(amount, card, opts, state) do
@@ -53,7 +53,7 @@ defmodule Cashier.Gateways.PayPal do
       |> put_payer(card, opts)
       |> put_transactions(amount, opts)
     
-    request("/v1/payments/payment", req_data, state)
+    request(:post, "/v1/payments/payment", req_data, state)
   end
 
   def refund(id, opts, state) do
@@ -67,20 +67,47 @@ defmodule Cashier.Gateways.PayPal do
       }
     end
 
-    request("/v1/payments/sale/#{id}/refund", req_data, state)
+    request(:post, "/v1/payments/sale/#{id}/refund", req_data, state)
+  end
+
+  def store(card, opts, state) do
+    req_data = build_credit_card(card, opts)
+
+    request(:post, "/v1/vault/credit-cards", req_data, state)
+  end
+
+  def unstore(id, _opts, state) do
+    request(:delete, "/v1/vault/credit-cards/#{id}", state)
   end
 
   def void(id, _opts, state) do
-    request("/v1/payments/authorization/#{id}/void", %{}, state)
+    request(:post, "/v1/payments/authorization/#{id}/void", %{}, state)
   end
 
-  defp request(url, data, state) do
-    HttpRequest.new(:post, resolve_url(state, url))
-      |> HttpRequest.put_auth(:bearer, state[:access_token])
+  defp request(:delete, url, state) do
+    build_request(:delete, url, state)
+      |> send
+  end
+
+  defp request(:post, url, data, state) do
+    build_request(:post, url, state)
       |> HttpRequest.put_body(data, :json)
+      |> send
+  end
+
+  defp build_request(method, url, state) do
+    HttpRequest.new(method, resolve_url(state, url))
+      |> HttpRequest.put_auth(:bearer, state[:access_token])
+  end
+
+  defp send(%HttpRequest{} = request) do
+    request
       |> HttpRequest.send
       |> respond
   end
+
+  defp respond({:ok, %{status_code: 204}}),
+    do: :ok
 
   defp respond({:ok, %{status_code: status_code, body: body}}) when status_code in [200, 201],
     do: Poison.decode(body)
@@ -125,19 +152,7 @@ defmodule Cashier.Gateways.PayPal do
   end
   
   defp put_credit_card(map, card = %PaymentCard{}, opts) do
-    {expire_month, expire_year} = card.expiry
-    {holder_first, holder_last} = card.holder
-  
-    credit_card = %{
-      type: card.brand,
-      number: card.number,
-      expire_year: expire_year,
-      expire_month: expire_month,
-      cvv2: card.cvv,
-      first_name: holder_first,
-      last_name: holder_last
-    }
-    |> put_billing_address(opts[:billing_address])
+    credit_card = build_credit_card(card, opts)
       
     Map.put(map, :credit_card, credit_card)
   end
@@ -184,5 +199,23 @@ defmodule Cashier.Gateways.PayPal do
       true -> Map.put(map, :is_final_capture, true)
       _ -> map 
     end
+  end
+
+  defp build_credit_card(card, opts) do
+    {expire_month, expire_year} = card.expiry
+    {holder_first, holder_last} = card.holder
+  
+    credit_card = %{
+      type: card.brand,
+      number: card.number,
+      expire_year: expire_year,
+      expire_month: expire_month,
+      cvv2: card.cvv,
+      first_name: holder_first,
+      last_name: holder_last
+    }
+    |> put_billing_address(opts[:billing_address])
+
+    credit_card
   end
 end
