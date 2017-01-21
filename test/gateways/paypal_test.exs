@@ -178,6 +178,26 @@ defmodule Cashier.Gateways.PayPalTest do
     assert result["id"] == "5678"
   end
 
+  test "store/3 should successfully process a credit card store request", %{config: config, bypass: bypass} do
+    Bypass.expect bypass, fn conn ->
+      {:ok, body, _} = Plug.Conn.read_body(conn)
+
+      assert "POST" == conn.method
+      assert "/v1/vault/credit-cards" == conn.request_path
+      assert has_header(conn, {"authorization", "bearer some.token"})
+      assert has_header(conn, {"content-type", "application/json"})
+      assert body == Fixtures.store_request
+
+      Plug.Conn.send_resp(conn, 201, "{\"id\":\"CARD-123\"}")
+    end
+
+    opts = default_opts ++ [billing_address: address]
+
+    {:ok, result} = Gateway.store(payment_card, opts, config)
+
+    assert result["id"] == "CARD-123"
+  end
+
   test "void/3 should successfully process a void authorization request", %{config: config, bypass: bypass} do
     Bypass.expect bypass, fn conn ->
       {:ok, body, _} = Plug.Conn.read_body(conn)
