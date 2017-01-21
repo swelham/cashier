@@ -15,6 +15,22 @@ easy to use public API and configuration.
 The following are basic usage examples on how to use cashier in it's current state. This library is being activily developed and is likely to 
 change as we move towards the first release.
 
+### Setup
+
+Add cashier as a dependency (currently you will need to use the git repository)
+```elixir
+defp deps do
+  {:cashier, git: "git://github.com/swelham/cashier.git"}
+end
+```
+
+Make sure the cashier application gets started
+```elixir
+def application do
+  [applications: [:cashier]]
+end
+```
+
 ### Config options
 ```elixir
 use Mix.Config
