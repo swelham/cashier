@@ -112,6 +112,18 @@ case Cashier.refund("<refund_id>", [amount: 9.99]) do
     {:ok, result}     -> IO.inspect result
     {:error, reason}  -> IO.inspect reason
 end
+
+#Store request
+case Cashier.store(card, [billing_address: address]) do
+    {:ok, result}     -> IO.inspect result
+    {:error, reason}  -> IO.inspect reason
+end
+
+#Unstore request
+case Cashier.unstore("<card_id>") do
+    :ok               -> IO.puts "card unstored"
+    {:error, reason}  -> IO.inspect reason
+end
 ```
 
 # Todo
