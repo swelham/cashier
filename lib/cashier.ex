@@ -35,6 +35,12 @@ defmodule Cashier do
   def store(card, opts),
     do: call(opts, {:store, card})
 
+  def unstore(id),
+    do: unstore(id, default_opts)
+
+  def unstore(id, opts),
+    do: call(opts, {:unstore, id})
+
   def void(id),
     do: void(id, default_opts)
 
