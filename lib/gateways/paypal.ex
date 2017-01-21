@@ -70,6 +70,12 @@ defmodule Cashier.Gateways.PayPal do
     request("/v1/payments/sale/#{id}/refund", req_data, state)
   end
 
+  def store(card, opts, state) do
+    req_data = build_credit_card(card, opts)
+
+    request("/v1/vault/credit-cards", req_data, state)
+  end
+
   def void(id, _opts, state) do
     request("/v1/payments/authorization/#{id}/void", %{}, state)
   end
@@ -125,19 +131,7 @@ defmodule Cashier.Gateways.PayPal do
   end
   
   defp put_credit_card(map, card = %PaymentCard{}, opts) do
-    {expire_month, expire_year} = card.expiry
-    {holder_first, holder_last} = card.holder
-  
-    credit_card = %{
-      type: card.brand,
-      number: card.number,
-      expire_year: expire_year,
-      expire_month: expire_month,
-      cvv2: card.cvv,
-      first_name: holder_first,
-      last_name: holder_last
-    }
-    |> put_billing_address(opts[:billing_address])
+    credit_card = build_credit_card(card, opts)
       
     Map.put(map, :credit_card, credit_card)
   end
@@ -184,5 +178,23 @@ defmodule Cashier.Gateways.PayPal do
       true -> Map.put(map, :is_final_capture, true)
       _ -> map 
     end
+  end
+
+  defp build_credit_card(card, opts) do
+    {expire_month, expire_year} = card.expiry
+    {holder_first, holder_last} = card.holder
+  
+    credit_card = %{
+      type: card.brand,
+      number: card.number,
+      expire_year: expire_year,
+      expire_month: expire_month,
+      cvv2: card.cvv,
+      first_name: holder_first,
+      last_name: holder_last
+    }
+    |> put_billing_address(opts[:billing_address])
+
+    credit_card
   end
 end
