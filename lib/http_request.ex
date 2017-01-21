@@ -9,7 +9,8 @@ defmodule Cashier.HttpRequest do
       method: method,
       url: url,
       headers: [],
-      opts: []
+      opts: [],
+      body: ""
     }
   end
   

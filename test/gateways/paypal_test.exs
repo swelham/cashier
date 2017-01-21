@@ -197,6 +197,18 @@ defmodule Cashier.Gateways.PayPalTest do
 
     assert result["id"] == "CARD-123"
   end
+  
+  test "unstore/3 should successfully process a credit card unstore request", %{config: config, bypass: bypass} do
+      Bypass.expect bypass, fn conn ->
+        assert "DELETE" == conn.method
+        assert "/v1/vault/credit-cards/CARD-123" == conn.request_path
+        assert has_header(conn, {"authorization", "bearer some.token"})
+
+        Plug.Conn.send_resp(conn, 204, "{}")
+      end
+
+      :ok = Gateway.unstore("CARD-123", [], config)
+    end
 
   test "void/3 should successfully process a void authorization request", %{config: config, bypass: bypass} do
     Bypass.expect bypass, fn conn ->
