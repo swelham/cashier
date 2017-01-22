@@ -156,6 +156,14 @@ defmodule Cashier.Gateways.PayPal do
       
     Map.put(map, :credit_card, credit_card)
   end
+
+  defp put_credit_card(map, card_id, _opts) do
+    credit_card = %{
+      credit_card_id: card_id
+    }
+      
+    Map.put(map, :credit_card_token, credit_card)
+  end
   
   defp put_billing_address(map, %Address{} = address) do
     address = %{

@@ -11,6 +11,17 @@ defmodule Cashier.PayPalFixtures do
     }
   end
 
+  def authorize_stored_card_request do
+    Poison.encode! %{
+      intent: "authorize",
+      payer: %{
+        payment_method: "credit_card",
+        funding_instruments: funding_instruments_stored_card
+      },
+      transactions: transactions
+    }
+  end
+
   def capture_request do
     Poison.encode! %{
       amount: %{
@@ -50,6 +61,17 @@ defmodule Cashier.PayPalFixtures do
     }
   end
 
+  def purchase_stored_card_request do
+    Poison.encode! %{
+      intent: "sale",
+      payer: %{
+        payment_method: "credit_card",
+        funding_instruments: funding_instruments_stored_card
+      },
+      transactions: transactions
+    }
+  end
+
   def store_request do
     Poison.encode! credit_card
   end
@@ -74,6 +96,16 @@ defmodule Cashier.PayPalFixtures do
     [
       %{
         credit_card: credit_card
+      }
+    ]
+  end
+
+  def funding_instruments_stored_card do
+    [
+      %{
+        credit_card_token: %{
+          credit_card_id: "CARD-123"
+        }
       }
     ]
   end
