@@ -84,12 +84,14 @@ card = %PaymentCard{
 #       data returned from the payment provider, this will change in the future.
 
 # Purchase request
+# the card parameter can be either a %PaymentCard or stored card id 
 case Cashier.purchase(9.99, card, [billing_address: address]) do
     {:ok, result}     -> IO.inspect result
     {:error, reason}  -> IO.inspect reason
 end
 
 # Authorize request
+# the card parameter can be either a %PaymentCard or stored card id 
 case Cashier.authorize(9.99, card, [billing_address: address]) do
     {:ok, result}     -> IO.inspect result
     {:error, reason}  -> IO.inspect reason
