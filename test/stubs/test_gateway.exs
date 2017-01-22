@@ -12,6 +12,12 @@ defmodule Cashier.TestGateway do
 
   def refund(_, _, _),
     do: respond("refund")
+  
+  def store(_, _, _),
+    do: respond("store")
+
+  def unstore(_, _, _),
+    do: respond("unstore")
 
   def void(_, _, _),
     do: respond("void")

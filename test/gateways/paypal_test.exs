@@ -80,6 +80,26 @@ defmodule Cashier.Gateways.PayPalTest do
     assert result["id"] == "PAY-123"
   end
 
+  test "authorize/4 should successfully process a stored credit card authorization request", %{config: config, bypass: bypass} do
+    Bypass.expect bypass, fn conn ->
+      {:ok, body, _} = Plug.Conn.read_body(conn)
+
+      assert "POST" == conn.method
+      assert "/v1/payments/payment" == conn.request_path
+      assert has_header(conn, {"authorization", "bearer some.token"})
+      assert has_header(conn, {"content-type", "application/json"})
+      assert body == Fixtures.authorize_stored_card_request
+
+      Plug.Conn.send_resp(conn, 201, "{\"id\":\"PAY-123\"}")
+    end
+
+    opts = default_opts ++ [billing_address: address]
+
+    {:ok, result} = Gateway.authorize(9.75, "CARD-123", opts, config)
+
+    assert result["id"] == "PAY-123"
+  end
+
   test "capture/4 should successfully process a capture request", %{config: config, bypass: bypass} do
     Bypass.expect bypass, fn conn ->
       {:ok, body, _} = Plug.Conn.read_body(conn)
@@ -137,6 +157,26 @@ defmodule Cashier.Gateways.PayPalTest do
 
     assert result["id"] == "PAY-123"
   end
+
+  test "purchase/4 should successfully process a stored credit card purchase request", %{config: config, bypass: bypass} do
+    Bypass.expect bypass, fn conn ->
+      {:ok, body, _} = Plug.Conn.read_body(conn)
+
+      assert "POST" == conn.method
+      assert "/v1/payments/payment" == conn.request_path
+      assert has_header(conn, {"authorization", "bearer some.token"})
+      assert has_header(conn, {"content-type", "application/json"})
+      assert body == Fixtures.purchase_stored_card_request
+
+      Plug.Conn.send_resp(conn, 201, "{\"id\":\"PAY-123\"}")
+    end
+
+    opts = default_opts ++ [billing_address: address]
+
+    {:ok, result} = Gateway.purchase(9.75, "CARD-123", opts, config)
+
+    assert result["id"] == "PAY-123"
+  end
   
   test "refund/3 should successfully process a refund request", %{config: config, bypass: bypass} do
     Bypass.expect bypass, fn conn ->
@@ -177,6 +217,38 @@ defmodule Cashier.Gateways.PayPalTest do
 
     assert result["id"] == "5678"
   end
+
+  test "store/3 should successfully process a credit card store request", %{config: config, bypass: bypass} do
+    Bypass.expect bypass, fn conn ->
+      {:ok, body, _} = Plug.Conn.read_body(conn)
+
+      assert "POST" == conn.method
+      assert "/v1/vault/credit-cards" == conn.request_path
+      assert has_header(conn, {"authorization", "bearer some.token"})
+      assert has_header(conn, {"content-type", "application/json"})
+      assert body == Fixtures.store_request
+
+      Plug.Conn.send_resp(conn, 201, "{\"id\":\"CARD-123\"}")
+    end
+
+    opts = default_opts ++ [billing_address: address]
+
+    {:ok, result} = Gateway.store(payment_card, opts, config)
+
+    assert result["id"] == "CARD-123"
+  end
+  
+  test "unstore/3 should successfully process a credit card unstore request", %{config: config, bypass: bypass} do
+      Bypass.expect bypass, fn conn ->
+        assert "DELETE" == conn.method
+        assert "/v1/vault/credit-cards/CARD-123" == conn.request_path
+        assert has_header(conn, {"authorization", "bearer some.token"})
+
+        Plug.Conn.send_resp(conn, 204, "{}")
+      end
+
+      :ok = Gateway.unstore("CARD-123", [], config)
+    end
 
   test "void/3 should successfully process a void authorization request", %{config: config, bypass: bypass} do
     Bypass.expect bypass, fn conn ->

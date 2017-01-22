@@ -55,6 +55,30 @@ defmodule CashierTest do
     assert result == {:ok, "refund from test_gateway"} 
   end
 
+  test "store/1 should call into default gateway" do
+    result = Cashier.store(nil)
+
+    assert result == {:ok, "store from dummy_gateway"}
+  end
+
+  test "store/2 should call into a specified gateway", %{gateway: gateway} do
+    result = Cashier.store(nil, [gateway: gateway])
+
+    assert result == {:ok, "store from test_gateway"}
+  end
+
+  test "unstore/1 should call into default gateway" do
+    result = Cashier.unstore(nil)
+
+    assert result == {:ok, "unstore from dummy_gateway"}
+  end
+
+  test "unstore/2 should call into a specified gateway", %{gateway: gateway} do
+    result = Cashier.unstore(nil, [gateway: gateway])
+
+    assert result == {:ok, "unstore from test_gateway"}
+  end
+
   test "void/1 should call into default gateway" do
     result = Cashier.void("")
 

@@ -84,12 +84,14 @@ card = %PaymentCard{
 #       data returned from the payment provider, this will change in the future.
 
 # Purchase request
+# the card parameter can be either a %PaymentCard or stored card id 
 case Cashier.purchase(9.99, card, [billing_address: address]) do
     {:ok, result}     -> IO.inspect result
     {:error, reason}  -> IO.inspect reason
 end
 
 # Authorize request
+# the card parameter can be either a %PaymentCard or stored card id 
 case Cashier.authorize(9.99, card, [billing_address: address]) do
     {:ok, result}     -> IO.inspect result
     {:error, reason}  -> IO.inspect reason
@@ -110,6 +112,18 @@ end
 #Refund request
 case Cashier.refund("<refund_id>", [amount: 9.99]) do
     {:ok, result}     -> IO.inspect result
+    {:error, reason}  -> IO.inspect reason
+end
+
+#Store request
+case Cashier.store(card, [billing_address: address]) do
+    {:ok, result}     -> IO.inspect result
+    {:error, reason}  -> IO.inspect reason
+end
+
+#Unstore request
+case Cashier.unstore("<card_id>") do
+    :ok               -> IO.puts "card unstored"
     {:error, reason}  -> IO.inspect reason
 end
 ```
