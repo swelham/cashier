@@ -93,7 +93,10 @@ defmodule Cashier.Gateways.PayPalTest do
       Plug.Conn.send_resp(conn, 201, "{\"id\":\"PAY-123\"}")
     end
 
-    opts = default_opts ++ [billing_address: address]
+    opts = default_opts ++ [
+      billing_address: address,
+      external_customer_id: "CUST-1"
+    ]
 
     {:ok, result} = Gateway.authorize(9.75, "CARD-123", opts, config)
 
@@ -171,7 +174,10 @@ defmodule Cashier.Gateways.PayPalTest do
       Plug.Conn.send_resp(conn, 201, "{\"id\":\"PAY-123\"}")
     end
 
-    opts = default_opts ++ [billing_address: address]
+    opts = default_opts ++ [
+      billing_address: address,
+      external_customer_id: "CUST-1"
+    ]
 
     {:ok, result} = Gateway.purchase(9.75, "CARD-123", opts, config)
 
@@ -231,13 +237,16 @@ defmodule Cashier.Gateways.PayPalTest do
       Plug.Conn.send_resp(conn, 201, "{\"id\":\"CARD-123\"}")
     end
 
-    opts = default_opts ++ [billing_address: address]
+    opts = default_opts ++ [
+      billing_address: address,
+      external_customer_id: "CUST-1"
+    ]
 
     {:ok, result} = Gateway.store(payment_card, opts, config)
 
     assert result["id"] == "CARD-123"
   end
-  
+
   test "unstore/3 should successfully process a credit card unstore request", %{config: config, bypass: bypass} do
       Bypass.expect bypass, fn conn ->
         assert "DELETE" == conn.method

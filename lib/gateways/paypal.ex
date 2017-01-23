@@ -157,10 +157,11 @@ defmodule Cashier.Gateways.PayPal do
     Map.put(map, :credit_card, credit_card)
   end
 
-  defp put_credit_card(map, card_id, _opts) do
+  defp put_credit_card(map, card_id, opts) do
     credit_card = %{
       credit_card_id: card_id
     }
+    |> put_external_customer_id(opts)
       
     Map.put(map, :credit_card_token, credit_card)
   end
@@ -223,7 +224,15 @@ defmodule Cashier.Gateways.PayPal do
       last_name: holder_last
     }
     |> put_billing_address(opts[:billing_address])
+    |> put_external_customer_id(opts)
 
     credit_card
+  end
+
+  defp put_external_customer_id(card, opts) do
+    case opts[:external_customer_id] do
+      nil -> card
+      id -> Map.put(card, :external_customer_id, id)
+    end
   end
 end

@@ -73,7 +73,9 @@ defmodule Cashier.PayPalFixtures do
   end
 
   def store_request do
-    Poison.encode! credit_card
+    credit_card
+      |> Map.put(:external_customer_id, "CUST-1")
+      |> Poison.encode!
   end
 
   def transactions do
@@ -104,7 +106,8 @@ defmodule Cashier.PayPalFixtures do
     [
       %{
         credit_card_token: %{
-          credit_card_id: "CARD-123"
+          credit_card_id: "CARD-123",
+          external_customer_id: "CUST-1"
         }
       }
     ]
