@@ -17,10 +17,10 @@ defmodule Cashier.TestGateway do
     do: respond("store")
 
   def unstore(_, _, _),
-    do: respond("unstore")
+    do: {:ok, {:test, "raw_data"}}
 
   def void(_, _, _),
     do: respond("void")
 
-  defp respond(key), do: {:ok, "#{key} from test_gateway"}
+  defp respond(key), do: {:ok, "#{key}_id", {:test, "raw_data"}}
 end

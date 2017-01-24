@@ -17,10 +17,10 @@ defmodule Cashier.Gateways.Dummy do
     do: respond("store")
 
   def unstore(_, _, _),
-    do: respond("unstore")
+    do: {:ok, {:dummy, "raw_data"}}
 
   def void(_, _, _),
     do: respond("void")
 
-  defp respond(key), do: {:ok, "#{key} from dummy_gateway"}
+  defp respond(key), do: {:ok, "#{key}_id", {:dummy, "raw_data"}}
 end

@@ -107,10 +107,13 @@ defmodule Cashier.Gateways.PayPal do
   end
 
   defp respond({:ok, %{status_code: 204}}),
-    do: :ok
+    do: {:ok, {:paypal, nil}}
 
-  defp respond({:ok, %{status_code: status_code, body: body}}) when status_code in [200, 201],
-    do: Poison.decode(body)
+  defp respond({:ok, %{status_code: status_code, body: body}}) when status_code in [200, 201] do
+    {:ok, response} = Poison.decode(body)
+
+    {:ok, response["id"], {:paypal, body}}
+  end
 
   defp respond({:ok, %{status_code: 401}}),
     do: {:stop, :unauthorized}

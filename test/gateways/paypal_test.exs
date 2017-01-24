@@ -61,6 +61,8 @@ defmodule Cashier.Gateways.PayPalTest do
   end
 
   test "authorize/4 should successfully process a credit card authorization request", %{config: config, bypass: bypass} do
+    expected_response = "{\"id\":\"PAY-123\"}"
+
     Bypass.expect bypass, fn conn ->
       {:ok, body, _} = Plug.Conn.read_body(conn)
 
@@ -70,17 +72,20 @@ defmodule Cashier.Gateways.PayPalTest do
       assert has_header(conn, {"content-type", "application/json"})
       assert body == Fixtures.authorize_request
 
-      Plug.Conn.send_resp(conn, 201, "{\"id\":\"PAY-123\"}")
+      Plug.Conn.send_resp(conn, 201, expected_response)
     end
 
     opts = default_opts ++ [billing_address: address]
 
-    {:ok, result} = Gateway.authorize(9.75, payment_card, opts, config)
+    {:ok, id, {:paypal, response}} = Gateway.authorize(9.75, payment_card, opts, config)
 
-    assert result["id"] == "PAY-123"
+    assert id == "PAY-123"
+    assert response == expected_response
   end
 
   test "authorize/4 should successfully process a stored credit card authorization request", %{config: config, bypass: bypass} do
+    expected_response = "{\"id\":\"PAY-123\"}"
+
     Bypass.expect bypass, fn conn ->
       {:ok, body, _} = Plug.Conn.read_body(conn)
 
@@ -90,7 +95,7 @@ defmodule Cashier.Gateways.PayPalTest do
       assert has_header(conn, {"content-type", "application/json"})
       assert body == Fixtures.authorize_stored_card_request
 
-      Plug.Conn.send_resp(conn, 201, "{\"id\":\"PAY-123\"}")
+      Plug.Conn.send_resp(conn, 201, expected_response)
     end
 
     opts = default_opts ++ [
@@ -98,12 +103,15 @@ defmodule Cashier.Gateways.PayPalTest do
       external_customer_id: "CUST-1"
     ]
 
-    {:ok, result} = Gateway.authorize(9.75, "CARD-123", opts, config)
+    {:ok, id, {:paypal, response}} = Gateway.authorize(9.75, "CARD-123", opts, config)
 
-    assert result["id"] == "PAY-123"
+    assert id == "PAY-123"
+    assert response == expected_response
   end
 
   test "capture/4 should successfully process a capture request", %{config: config, bypass: bypass} do
+    expected_response = "{\"id\":\"5678\"}"
+
     Bypass.expect bypass, fn conn ->
       {:ok, body, _} = Plug.Conn.read_body(conn)
 
@@ -113,15 +121,18 @@ defmodule Cashier.Gateways.PayPalTest do
       assert has_header(conn, {"content-type", "application/json"})
       assert body == Fixtures.capture_request
 
-      Plug.Conn.send_resp(conn, 200, "{\"id\":\"5678\"}")
+      Plug.Conn.send_resp(conn, 200, expected_response)
     end
 
-    {:ok, result} = Gateway.capture("1234", 9.75, default_opts, config)
+    {:ok, id, {:paypal, response}} = Gateway.capture("1234", 9.75, default_opts, config)
 
-    assert result["id"] == "5678"
+    assert id == "5678"
+    assert response == expected_response
   end
 
   test "capture/4 should successfully process a final capture request ", %{config: config, bypass: bypass} do
+    expected_response = "{\"id\":\"5678\"}"
+  
     Bypass.expect bypass, fn conn ->
       {:ok, body, _} = Plug.Conn.read_body(conn)
 
@@ -131,17 +142,20 @@ defmodule Cashier.Gateways.PayPalTest do
       assert has_header(conn, {"content-type", "application/json"})
       assert body == Fixtures.capture_final_request
 
-      Plug.Conn.send_resp(conn, 200, "{\"id\":\"5678\"}")
+      Plug.Conn.send_resp(conn, 200, expected_response)
     end
 
     opts = [final_capture: true] ++ default_opts
 
-    {:ok, result} = Gateway.capture("1234", 9.75, opts, config)
+    {:ok, id, {:paypal, response}} = Gateway.capture("1234", 9.75, opts, config)
 
-    assert result["id"] == "5678"
+    assert id == "5678"
+    assert response == expected_response
   end
 
   test "purchase/4 should successfully process a credit card purchase request", %{config: config, bypass: bypass} do
+    expected_response = "{\"id\":\"PAY-123\"}"
+
     Bypass.expect bypass, fn conn ->
       {:ok, body, _} = Plug.Conn.read_body(conn)
 
@@ -151,17 +165,20 @@ defmodule Cashier.Gateways.PayPalTest do
       assert has_header(conn, {"content-type", "application/json"})
       assert body == Fixtures.purchase_request
 
-      Plug.Conn.send_resp(conn, 201, "{\"id\":\"PAY-123\"}")
+      Plug.Conn.send_resp(conn, 201, expected_response)
     end
 
     opts = default_opts ++ [billing_address: address]
 
-    {:ok, result} = Gateway.purchase(9.75, payment_card, opts, config)
+    {:ok, id, {:paypal, response}} = Gateway.purchase(9.75, payment_card, opts, config)
 
-    assert result["id"] == "PAY-123"
+    assert id == "PAY-123"
+    assert response == expected_response
   end
 
   test "purchase/4 should successfully process a stored credit card purchase request", %{config: config, bypass: bypass} do
+    expected_response = "{\"id\":\"PAY-123\"}"
+
     Bypass.expect bypass, fn conn ->
       {:ok, body, _} = Plug.Conn.read_body(conn)
 
@@ -171,7 +188,7 @@ defmodule Cashier.Gateways.PayPalTest do
       assert has_header(conn, {"content-type", "application/json"})
       assert body == Fixtures.purchase_stored_card_request
 
-      Plug.Conn.send_resp(conn, 201, "{\"id\":\"PAY-123\"}")
+      Plug.Conn.send_resp(conn, 201, expected_response)
     end
 
     opts = default_opts ++ [
@@ -179,12 +196,15 @@ defmodule Cashier.Gateways.PayPalTest do
       external_customer_id: "CUST-1"
     ]
 
-    {:ok, result} = Gateway.purchase(9.75, "CARD-123", opts, config)
+    {:ok, id, {:paypal, response}} = Gateway.purchase(9.75, "CARD-123", opts, config)
 
-    assert result["id"] == "PAY-123"
+    assert id == "PAY-123"
+    assert response == expected_response
   end
-  
+
   test "refund/3 should successfully process a refund request", %{config: config, bypass: bypass} do
+    expected_response = "{\"id\":\"5678\"}"
+
     Bypass.expect bypass, fn conn ->
       {:ok, body, _} = Plug.Conn.read_body(conn)
 
@@ -194,17 +214,20 @@ defmodule Cashier.Gateways.PayPalTest do
       assert has_header(conn, {"content-type", "application/json"})
       assert body == "{}"
 
-      Plug.Conn.send_resp(conn, 200, "{\"id\":\"5678\"}")
+      Plug.Conn.send_resp(conn, 200, expected_response)
     end
 
     opts = default_opts
 
-    {:ok, result} = Gateway.refund("1234", opts, config)
+    {:ok, id, {:paypal, response}} = Gateway.refund("1234", opts, config)
 
-    assert result["id"] == "5678"
+    assert id == "5678"
+    assert response == expected_response
   end
 
   test "refund/3 should successfully process a partial refund request", %{config: config, bypass: bypass} do
+    expected_response = "{\"id\":\"5678\"}"
+
     Bypass.expect bypass, fn conn ->
       {:ok, body, _} = Plug.Conn.read_body(conn)
 
@@ -214,17 +237,20 @@ defmodule Cashier.Gateways.PayPalTest do
       assert has_header(conn, {"content-type", "application/json"})
       assert body == Fixtures.partial_refund_request
 
-      Plug.Conn.send_resp(conn, 200, "{\"id\":\"5678\"}")
+      Plug.Conn.send_resp(conn, 200, expected_response)
     end
 
     opts = [amount: 9.75] ++ default_opts
 
-    {:ok, result} = Gateway.refund("1234", opts, config)
+    {:ok, id, {:paypal, response}} = Gateway.refund("1234", opts, config)
 
-    assert result["id"] == "5678"
+    assert id == "5678"
+    assert response == expected_response
   end
 
   test "store/3 should successfully process a credit card store request", %{config: config, bypass: bypass} do
+    expected_response = "{\"id\":\"CARD-123\"}"
+
     Bypass.expect bypass, fn conn ->
       {:ok, body, _} = Plug.Conn.read_body(conn)
 
@@ -234,7 +260,7 @@ defmodule Cashier.Gateways.PayPalTest do
       assert has_header(conn, {"content-type", "application/json"})
       assert body == Fixtures.store_request
 
-      Plug.Conn.send_resp(conn, 201, "{\"id\":\"CARD-123\"}")
+      Plug.Conn.send_resp(conn, 201, expected_response)
     end
 
     opts = default_opts ++ [
@@ -242,9 +268,10 @@ defmodule Cashier.Gateways.PayPalTest do
       external_customer_id: "CUST-1"
     ]
 
-    {:ok, result} = Gateway.store(payment_card, opts, config)
+    {:ok, id, {:paypal, response}} = Gateway.store(payment_card, opts, config)
 
-    assert result["id"] == "CARD-123"
+    assert id == "CARD-123"
+    assert response == expected_response
   end
 
   test "unstore/3 should successfully process a credit card unstore request", %{config: config, bypass: bypass} do
@@ -253,13 +280,15 @@ defmodule Cashier.Gateways.PayPalTest do
         assert "/v1/vault/credit-cards/CARD-123" == conn.request_path
         assert has_header(conn, {"authorization", "bearer some.token"})
 
-        Plug.Conn.send_resp(conn, 204, "{}")
+        Plug.Conn.send_resp(conn, 204, "")
       end
 
-      :ok = Gateway.unstore("CARD-123", [], config)
+      {:ok, {:paypal, nil}} = Gateway.unstore("CARD-123", [], config)
     end
 
   test "void/3 should successfully process a void authorization request", %{config: config, bypass: bypass} do
+    expected_response = "{\"id\":\"5678\"}"
+
     Bypass.expect bypass, fn conn ->
       {:ok, body, _} = Plug.Conn.read_body(conn)
 
@@ -269,12 +298,13 @@ defmodule Cashier.Gateways.PayPalTest do
       assert has_header(conn, {"content-type", "application/json"})
       assert body == "{}"
 
-      Plug.Conn.send_resp(conn, 200, "{\"id\":\"5678\"}")
+      Plug.Conn.send_resp(conn, 200, expected_response)
     end
 
-    {:ok, result} = Gateway.void("1234", [], config)
+    {:ok, id, {:paypal, response}} = Gateway.void("1234", [], config)
 
-    assert result["id"] == "5678"
+    assert id == "5678"
+    assert response == expected_response
   end
 
   defp default_opts do
