@@ -116,7 +116,7 @@ defmodule Cashier.Gateways.PayPal do
   end
 
   defp respond({:ok, %{status_code: 401}}),
-    do: {:stop, :unauthorized}
+    do: {:stop, {:error, :unauthorized}}
 
   defp respond({:ok, %{status_code: status_code, body: body}}),
     do: {:error, unexpected_status_error(status_code, body)}

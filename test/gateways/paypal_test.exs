@@ -21,7 +21,7 @@ defmodule Cashier.Gateways.PayPalTest do
 
     {:ok, config: config, bypass: bypass}
   end
-
+  
   test "init/1 should put the PayPal access_token into state", %{config: config, bypass: bypass} do
     Bypass.expect bypass, fn conn ->
       {:ok, body, _} = Plug.Conn.read_body(conn)
@@ -54,10 +54,19 @@ defmodule Cashier.Gateways.PayPalTest do
 
   test "the process should stop when an unauthorized status code is returned", %{config: config, bypass: bypass} do
     Bypass.expect bypass, fn conn ->
-      Plug.Conn.send_resp(conn, 401, "")
+      case conn.request_path do
+        "/v1/oauth2/token" ->
+          Plug.Conn.send_resp(conn, 200, "{\"access_token\": \"some_token\"}")
+        _ ->
+          Plug.Conn.send_resp(conn, 401, "")
+      end
     end
 
-    {:stop, :unauthorized} = Gateway.void("1234", [], config)
+    {:ok, pid} = GenServer.start_link(Cashier.Gateways.PayPal, config)
+
+    {:error, :unauthorized} = GenServer.call(pid, {:void, "", []})
+
+    refute Process.alive?(pid)
   end
 
   test "authorize/4 should successfully process a credit card authorization request", %{config: config, bypass: bypass} do

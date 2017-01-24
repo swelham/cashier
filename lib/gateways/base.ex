@@ -8,26 +8,43 @@ defmodule Cashier.Gateways.Base do
         GenServer.start_link(__MODULE__, opts, name: unquote(opts[:name]))
       end
 
-      def handle_call({:authorize, amount, card, opts}, _from, state),
-        do: {:reply, authorize(amount, card, opts, state), state}
+      def handle_call({:authorize, amount, card, opts}, _from, state) do
+        authorize(amount, card, opts, state)
+          |> handle_response(state)
+      end
+      def handle_call({:capture, id, amount, opts}, _from, state) do
+        capture(id, amount, opts, state)
+          |> handle_response(state)
+      end
+      def handle_call({:purchase, amount, card, opts}, _from, state) do
+        purchase(amount, card, opts, state)
+          |> handle_response(state)
+      end
+      def handle_call({:refund, id, opts}, _from, state) do
+        refund(id, opts, state)
+          |> handle_response(state)
+      end
+      def handle_call({:store, card, opts}, _from, state) do
+        store(card, opts, state)
+          |> handle_response(state)
+      end
+      def handle_call({:unstore, id, opts}, _from, state) do
+        unstore(id, opts, state)
+          |> handle_response(state)
+      end
+      def handle_call({:void, id, opts}, _from, state) do
+        void(id, opts, state)
+          |> handle_response(state)
+      end
 
-      def handle_call({:capture, id, amount, opts}, _from, state),
-        do: {:reply, capture(id, amount, opts, state), state}
-
-      def handle_call({:purchase, amount, card, opts}, _from, state),
-        do: {:reply, purchase(amount, card, opts, state), state}
-      
-      def handle_call({:refund, id, opts}, _from, state),
-        do: {:reply, refund(id, opts, state), state}
-      
-      def handle_call({:store, card, opts}, _from, state),
-        do: {:reply, store(card, opts, state), state}
-
-      def handle_call({:unstore, id, opts}, _from, state),
-        do: {:reply, unstore(id, opts, state), state}
-
-      def handle_call({:void, id, opts}, _from, state),
-        do: {:reply, void(id, opts, state), state}
+      def handle_response({:ok, _} = response, state),
+        do: {:reply, response, state}
+      def handle_response({:ok, _, _} = response, state),
+        do: {:reply, response, state}
+      def handle_response({:stop, reason}, state),
+        do: {:stop, :normal, reason, state}
+      def handle_response(_, _, state),
+        do: {:stop, :normal, {:error, :unknown_response}, state}
 
       # overridable functions
       def init(opts), do: {:ok, opts}
@@ -53,6 +70,9 @@ defmodule Cashier.Gateways.Base do
       def void(id, opts, state),
         do: :not_implemented
 
+      def terminate(reason, state),
+        do: :not_implemented
+
       defoverridable [
         init: 1,
         authorize: 4,
@@ -61,7 +81,8 @@ defmodule Cashier.Gateways.Base do
         refund: 3,
         store: 3,
         unstore: 3,
-        void: 3
+        void: 3,
+        terminate: 2
       ]
     end
   end

@@ -22,5 +22,8 @@ defmodule Cashier.TestGateway do
   def void(_, _, _),
     do: respond("void")
 
+  def emulate_stop_result,
+    do: {:stop, :some_reason}
+
   defp respond(key), do: {:ok, "#{key}_id", {:test, "raw_data"}}
 end
