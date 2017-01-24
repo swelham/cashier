@@ -17,10 +17,10 @@ change as we move towards the first release.
 
 ### Setup
 
-Add cashier as a dependency (currently you will need to use the git repository)
+Add cashier as a dependency
 ```elixir
 defp deps do
-  {:cashier, git: "git://github.com/swelham/cashier.git"}
+  {:cashier, "~> 0.2.0"}
 end
 ```
 
