@@ -1,4 +1,4 @@
-defmodule Cashier.TestGateway do
+defmodule Cashier.Gateways.Test do
   use Cashier.Gateways.Base
 
   def authorize(_, _, _),

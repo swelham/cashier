@@ -2,8 +2,8 @@ defmodule Cashier.Pipeline.PipelineSupervisor do
   use Supervisor
 
   @gateways [
-    {:dummy, Cashier.Gateways.DummySupervisor},
-    #{:paypal, Cashier.Gateways.PayPalSupervisor}
+    dummy: Cashier.Gateways.DummySupervisor,
+    #{:paypal, Cashier.Gateways.PayPal}
   ]
 
   def start_link,
@@ -12,9 +12,7 @@ defmodule Cashier.Pipeline.PipelineSupervisor do
   def init(_opts) do
     children = [
       worker(Cashier.Pipeline.GatewayProducer, []),
-      worker(Cashier.Pipeline.GatewayRouter, []),
-      # TOOD: start up all configured gateway specific supervisors
-      #worker(Cashier.Gateways.DummySupervisor, [])
+      worker(Cashier.Pipeline.GatewayRouter, [])
     ] ++ get_gateway_supervisors
 
     supervise(children, strategy: :one_for_one)
@@ -27,13 +25,13 @@ defmodule Cashier.Pipeline.PipelineSupervisor do
       |> Enum.map(&map_to_worker/1)
   end
 
-  defp map_child(gateway) do
-    case Application.get_env(:cashier, elem(gateway, 0), nil) do
+  defp map_child({gateway, mod}) do
+    case Application.get_env(:cashier, gateway, nil) do
       nil -> nil
-      config -> {gateway, config}
+      config -> {mod, config}
     end
   end
 
-  defp map_to_worker({gateway, config}),
-    do: worker(elem(gateway, 1), [config])
+  defp map_to_worker({mod, config}),
+    do: worker(mod, [config])
 end

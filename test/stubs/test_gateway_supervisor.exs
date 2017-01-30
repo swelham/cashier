@@ -1,9 +1,9 @@
-defmodule Cashier.Gateways.DummySupervisor do
+defmodule Cashier.Gateways.TestSupervisor do
   use ConsumerSupervisor
 
   def start_link(_opts) do
     children = [
-      worker(Cashier.Gateways.Dummy, [], restart: :temporary)
+      worker(Cashier.Gateways.Test, [], restart: :temporary)
     ]
 
     ConsumerSupervisor.start_link(
@@ -12,13 +12,13 @@ defmodule Cashier.Gateways.DummySupervisor do
       name: __MODULE__,
       subscribe_to: [{
         Cashier.Pipeline.GatewayRouter,
-        max_demand: 50, # todo: max_demand needs to be a config option
+        max_demand: 50,
         selector: &dispatch_selector/1
       }],
     )
   end
 
   defp dispatch_selector({_, _, opts}),
-    do: Keyword.get(opts, :gateway) == :dummy
+    do: Keyword.get(opts, :gateway) == :test
   defp dispatch_selector(_), do: false
 end

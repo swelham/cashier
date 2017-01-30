@@ -40,6 +40,8 @@ defmodule Cashier do
     do: send_event(opts, {:void, id})
 
   defp send_event(opts, event) do
+    opts = merge_default_opts(opts)
+    
     Cashier.Pipeline.GatewayProducer.send_demand({self(), event, opts})
 
     receive do
@@ -63,6 +65,25 @@ defmodule Cashier do
       defaults -> defaults[key]
     end
   end
+
+  defp merge_default_opts(opts),
+    do: Keyword.merge(default_opts, opts)
+
+  defp gateway_timeout(gateway),
+    do: Application.get_env(:cashier, gateway)[:timeout] || default_timeout
+
+  defp default_timeout,
+    do: get_default(:timeout) || 5000
+
+  # defp resolve_gateway(opts) do
+  #   case Keyword.get(opts, :gateway) do
+  #     nil -> nil
+  #     gateway -> {gateway, gateway_config(gateway)}
+  #   end
+  # end
+
+  # defp gateway_config(gateway),
+  #   do: Application.get_env(:cashier, gateway, nil)
 
   # defp call(opts, args) do
   #   opts = merge_default_opts(opts)
@@ -90,22 +111,6 @@ defmodule Cashier do
   # defp call_gateway(_, _),
   #   do: {:error, "The gateway failed to start"}
 
-  # defp resolve_gateway(opts) do
-  #   case Keyword.get(opts, :gateway) do
-  #     nil -> nil
-  #     gateway -> {gateway, gateway_config(gateway)}
-  #   end
-  # end
 
-  # defp gateway_config(gateway),
-  #   do: Application.get_env(:cashier, gateway, nil)
 
-  # defp merge_default_opts(opts),
-  #   do: Keyword.merge(default_opts, opts)
-
-  # defp gateway_timeout(gateway),
-  #   do: Application.get_env(:cashier, gateway)[:timeout] || default_timeout
-
-  # defp default_timeout,
-  #   do: get_default(:timeout) || 5000
 end

@@ -7,3 +7,5 @@ config :cashier, :cashier,
   ]
   
 config :cashier, :dummy, []
+
+config :cashier, :test, []

@@ -1,5 +1,5 @@
 defmodule Cashier.Gateways.Base do
-  defmacro __using__(opts) do
+  defmacro __using__(_opts) do
     quote do
       def start_link({pid, data, opts}) do
         Task.start_link(fn -> 
