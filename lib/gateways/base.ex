@@ -5,7 +5,7 @@ defmodule Cashier.Gateways.Base do
         do: start_link([])
 
       def start_link(opts) do
-        GenServer.start_link(__MODULE__, opts, name: unquote(opts[:name]))
+        GenServer.start_link(__MODULE__, opts)
       end
 
       def handle_call({:authorize, amount, card, opts}, _from, state) do

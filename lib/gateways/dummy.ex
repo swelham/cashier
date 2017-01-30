@@ -1,26 +1,9 @@
 defmodule Cashier.Gateways.Dummy do
-  use Cashier.Gateways.Base, name: :dummy
+  def start_link({:sendit, {pid, data}}) do
+    Task.start_link(fn -> 
+      Process.sleep(4000)
 
-  def authorize(_, _, _, _),
-    do: respond("authorize")
-
-  def capture(_, _, _, _),
-    do: respond("capture")
-
-  def purchase(_, _, _, _),
-    do: respond("purchase")
-
-  def refund(_, _, _),
-    do: respond("refund")
-
-  def store(_, _, _),
-    do: respond("store")
-
-  def unstore(_, _, _),
-    do: {:ok, {:dummy, "raw_data"}}
-
-  def void(_, _, _),
-    do: respond("void")
-
-  defp respond(key), do: {:ok, "#{key}_id", {:dummy, "raw_data"}}
+      send(pid, {:ok, data})
+    end)
+  end
 end
