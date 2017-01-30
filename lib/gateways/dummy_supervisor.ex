@@ -1,7 +1,7 @@
 defmodule Cashier.Gateways.DummySupervisor do
   use ConsumerSupervisor
 
-  def start_link do
+  def start_link(_opts) do
     children = [
       worker(Cashier.Gateways.Dummy, [], restart: :temporary)
     ]

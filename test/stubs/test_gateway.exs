@@ -1,25 +1,25 @@
 defmodule Cashier.TestGateway do
   use Cashier.Gateways.Base
 
-  def authorize(_, _, _, _),
+  def authorize(_, _, _),
     do: respond("authorize")
 
-  def capture(_, _, _, _),
+  def capture(_, _, _),
     do: respond("capture")
 
-  def purchase(_, _, _, _),
+  def purchase(_, _, _),
     do: respond("purchase")
 
-  def refund(_, _, _),
+  def refund(_, _),
     do: respond("refund")
-  
-  def store(_, _, _),
+
+  def store(_, _),
     do: respond("store")
 
-  def unstore(_, _, _),
+  def unstore(_, _),
     do: {:ok, {:test, "raw_data"}}
 
-  def void(_, _, _),
+  def void(_, _),
     do: respond("void")
 
   defp respond(key), do: {:ok, "#{key}_id", {:test, "raw_data"}}
