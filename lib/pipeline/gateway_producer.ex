@@ -5,7 +5,7 @@ defmodule Cashier.Pipeline.GatewayProducer do
     do: GenStage.start_link(__MODULE__, [], name: __MODULE__)
 
   def send_demand(event) do
-    GenStage.cast(__MODULE__, {:sendit, event})
+    GenStage.cast(__MODULE__, event)
   end
 
   def init(opts), do: {:producer, opts}

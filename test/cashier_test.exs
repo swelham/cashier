@@ -8,19 +8,6 @@ defmodule CashierTest do
   end
 
   @tag me: true
-  test "temp" do
-    :observer.start
-
-    for n <- 1..10 do
-      Task.async(fn ->
-        Cashier.test("a test event #{n}")
-      end)
-    end
-
-    Process.sleep(:infinity)
-    assert true
-  end
-
   test "authorize/2 should call into default gateway" do
     result = Cashier.authorize(0, nil)
 

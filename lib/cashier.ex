@@ -14,15 +14,13 @@ defmodule Cashier do
   def authorize(amount, card, opts),
     do: send_event(opts, {:authorize, amount, card})
 
-  def test(event), do: send_event(nil, event)
-
   defp send_event(opts, event) do
-    Cashier.Pipeline.GatewayProducer.send_demand({self(), event})
+    Cashier.Pipeline.GatewayProducer.send_demand({self(), event, opts})
 
     receive do
-      {:ok, result} ->
-        IO.inspect result
-      _ ->
+      {:ok, data} ->
+        data
+      _ -> # todo: add some proper error handling when there are process issues
         IO.puts "something went wrong"
     end
   end
