@@ -7,7 +7,6 @@ defmodule CashierTest do
     {:ok, %{gateway: pid}}
   end
 
-  @tag me: true
   test "authorize/2 should call into default gateway" do
     result = Cashier.authorize(0, nil)
 

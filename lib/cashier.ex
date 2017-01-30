@@ -1,18 +1,43 @@
 defmodule Cashier do
   use Application
-  # @gateways %{
-  #   dummy: Cashier.Gateways.Dummy,
-  #   paypal: Cashier.Gateways.PayPal
-  # }
 
   def start(_type, _args),
     do: Cashier.Pipeline.PipelineSupervisor.start_link
 
   def authorize(amount, card),
     do: authorize(amount, card, default_opts)
-
   def authorize(amount, card, opts),
     do: send_event(opts, {:authorize, amount, card})
+
+  def capture(id, amount),
+    do: capture(id, amount, default_opts)
+  def capture(id, amount, opts),
+    do: send_event(opts, {:capture, id, amount})
+
+  def purchase(amount, card),
+    do: purchase(amount, card, default_opts)
+  def purchase(amount, card, opts),
+    do: send_event(opts, {:purchase, amount, card})
+    
+  def refund(id),
+    do: refund(id, default_opts)
+  def refund(id, opts),
+    do: send_event(opts, {:refund, id})
+
+  def store(card),
+    do: store(card, default_opts)
+  def store(card, opts),
+    do: send_event(opts, {:store, card})
+
+  def unstore(id),
+    do: unstore(id, default_opts)
+  def unstore(id, opts),
+    do: send_event(opts, {:unstore, id})
+
+  def void(id),
+    do: void(id, default_opts)
+  def void(id, opts),
+    do: send_event(opts, {:void, id})
 
   defp send_event(opts, event) do
     Cashier.Pipeline.GatewayProducer.send_demand({self(), event, opts})
