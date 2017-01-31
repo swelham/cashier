@@ -2,7 +2,7 @@ defmodule Cashier.Pipeline.PipelineSupervisor do
   use Supervisor
 
   @gateways [
-    dummy: Cashier.Gateways.DummySupervisor,
+    dummy: Cashier.Gateways.Dummy.Supervisor,
     #{:paypal, Cashier.Gateways.PayPal}
   ]
 

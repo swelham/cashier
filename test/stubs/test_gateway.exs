@@ -1,4 +1,8 @@
 defmodule Cashier.Gateways.Test do
+  use Cashier.Gateways.BaseSupervisor,
+    module: Cashier.Gateways.Test,
+    name: :test
+    
   use Cashier.Gateways.Base
 
   def authorize(_, _, _),
