@@ -4,6 +4,8 @@ defmodule Cashier.Gateways.BaseSupervisor do
       defmodule Supervisor do
         use ConsumerSupervisor
 
+        def init(_args), do: {:producer_consumer, :no_state}
+
         def start_link(_opts) do
           children = [
             worker(unquote(opts[:module]), [], restart: :temporary)
