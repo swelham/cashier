@@ -1,6 +1,8 @@
 defmodule Cashier do
   use Application
 
+  alias Cashier.Pipeline.GatewayProducer
+
   def start(_type, _args),
     do: Cashier.Pipeline.PipelineSupervisor.start_link
 
@@ -40,15 +42,24 @@ defmodule Cashier do
     do: send_event(opts, {:void, id})
 
   defp send_event(opts, event) do
-    opts = merge_default_opts(opts)
+    opts = 
+      opts
+      |> merge_default_opts
+      |> merge_gateway_timeout
     
-    Cashier.Pipeline.GatewayProducer.send_demand({self(), event, opts})
+    GatewayProducer.send_demand({self(), event, opts})
 
     receive do
       {:ok, data} ->
         data
       _ -> # todo: add some proper error handling when there are process issues
         IO.puts "something went wrong"
+        {:error, :need_a_reason}
+    after
+      # todo: not sure this is the best approach as it leaves the
+      #       worker process running
+      opts[:timeout] ->
+        {:error, :timeout}
     end
   end
 
@@ -69,48 +80,12 @@ defmodule Cashier do
   defp merge_default_opts(opts),
     do: Keyword.merge(default_opts, opts)
 
+  defp merge_gateway_timeout(opts),
+    do: Keyword.put(opts, :timeout, gateway_timeout(opts[:gateway]))
+
   defp gateway_timeout(gateway),
     do: Application.get_env(:cashier, gateway)[:timeout] || default_timeout
 
   defp default_timeout,
     do: get_default(:timeout) || 5000
-
-  # defp resolve_gateway(opts) do
-  #   case Keyword.get(opts, :gateway) do
-  #     nil -> nil
-  #     gateway -> {gateway, gateway_config(gateway)}
-  #   end
-  # end
-
-  # defp gateway_config(gateway),
-  #   do: Application.get_env(:cashier, gateway, nil)
-
-  # defp call(opts, args) do
-  #   opts = merge_default_opts(opts)
-  #   args = Tuple.append(args, opts)
-
-  #   opts
-  #     |> resolve_gateway
-  #     |> start_gateway
-  #     |> call_gateway(args)
-  # end
-
-  # defp start_gateway(nil),
-  #   do: {:error, "A payment gateway was not specified"}
-  # defp start_gateway({gateway, config}) do
-  #   case @gateways[gateway] do
-  #     nil ->
-  #       {:error, "Unknown payment gateway was specified"}
-  #     gateway ->
-  #       GenServer.start_link(gateway, [config])
-  #   end
-  # end
-
-  # defp call_gateway({:ok, gateway}, args),
-  #   do: GenServer.call(gateway, args, gateway_timeout(gateway))
-  # defp call_gateway(_, _),
-  #   do: {:error, "The gateway failed to start"}
-
-
-
 end
