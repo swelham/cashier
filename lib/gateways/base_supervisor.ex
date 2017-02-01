@@ -1,6 +1,6 @@
 defmodule Cashier.Gateways.BaseSupervisor do
   defmacro __using__(opts) do
-    quote do
+    quote bind_quoted: [opts: opts]  do
       defmodule Supervisor do
         use ConsumerSupervisor
 

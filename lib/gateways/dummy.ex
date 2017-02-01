@@ -1,6 +1,6 @@
 defmodule Cashier.Gateways.Dummy do
   use Cashier.Gateways.BaseSupervisor,
-    module: Cashier.Gateways.Dummy,
+    module: __MODULE__,
     name: :dummy
 
   use Cashier.Gateways.Base

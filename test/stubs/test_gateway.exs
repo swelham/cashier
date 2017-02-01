@@ -1,6 +1,6 @@
 defmodule Cashier.Gateways.Test do
   use Cashier.Gateways.BaseSupervisor,
-    module: Cashier.Gateways.Test,
+    module: __MODULE__,
     name: :test
     
   use Cashier.Gateways.Base
