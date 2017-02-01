@@ -5,28 +5,29 @@ defmodule Cashier.Gateways.PayPal do
   alias Cashier.Address
   alias Cashier.PaymentCard
 
-  def init(opts) do
+  def init(state) do
+    # todo: access_token caching
     body = %{grant_type: "client_credentials"}
-    api_keys = {opts[:client_id], opts[:client_secret]}
+    api_keys = {state[:client_id], state[:client_secret]}
     
     request =
-      HttpRequest.new(:post, resolve_url(opts, "/v1/oauth2/token"))
+      HttpRequest.new(:post, resolve_url(state, "/v1/oauth2/token"))
       |> HttpRequest.put_body(body, :url_encoded)
       |> HttpRequest.put_auth(:basic, api_keys)
 
     case HttpRequest.send(request) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        opts =
+        state =
           body
           |> Poison.decode!
           |> Map.get("access_token")
-          |> put_access_token(opts)
+          |> put_access_token(state)
 
-        {:ok, opts}
+        {:ok, state}
       {:ok, %HTTPoison.Response{status_code: status_code}} ->
-        {:stop, unexpected_status_error(status_code, "requesting the PayPal access_token")}
+        {:error, unexpected_status_error(status_code, "requesting the PayPal access_token")}
       {:error, %HTTPoison.Error{reason: reason}} ->
-        {:stop, reason}
+        {:error, reason}
     end
   end
 

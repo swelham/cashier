@@ -1,6 +1,6 @@
 defmodule Cashier.Gateways.BaseSupervisor do
   defmacro __using__(opts) do
-    quote bind_quoted: [opts: opts]  do
+    quote bind_quoted: [opts: opts] do
       defmodule Supervisor do
         use ConsumerSupervisor
 
@@ -8,7 +8,7 @@ defmodule Cashier.Gateways.BaseSupervisor do
 
         def start_link(_opts) do
           children = [
-            worker(unquote(opts[:module]), [], restart: :temporary)
+            worker(unquote(opts[:module]), [gateway_config], restart: :temporary)
           ]
 
           ConsumerSupervisor.start_link(
@@ -19,13 +19,16 @@ defmodule Cashier.Gateways.BaseSupervisor do
               Cashier.Pipeline.GatewayRouter,
               max_demand: 50, # todo: max_demand needs to be a config option
               selector: &dispatch_selector/1
-            }],
+            }]
           )
         end
 
         defp dispatch_selector({_, _, opts}),
           do: Keyword.get(opts, :gateway) == unquote(opts[:name])
         defp dispatch_selector(_), do: false
+
+        defp gateway_config,
+          do: Application.get_env(:cashier, unquote(opts[:name]), nil)
       end
     end
   end

@@ -1,38 +1,41 @@
 defmodule Cashier.Gateways.Base do
   defmacro __using__(_opts) do
     quote do
-      def start_link({pid, data, opts}) do
-        Task.start_link(fn -> 
-          send(pid, {:ok, call(data, opts)})
+      def start_link(state, {pid, data, opts}) do
+        Task.start_link(fn ->
+          # todo: error handling here needs some thought
+          {:ok, state} = init(state)
+
+          send(pid, {:ok, call(data, opts, state)})
         end)
       end
 
-      def call({:authorize, amount, card}, opts) do
-        authorize(amount, card, opts)
+      def call({:authorize, amount, card}, opts, state) do
+        authorize(amount, card, opts, state)
           |> handle_response
       end
-      def call({:capture, id, amount}, opts) do
-        capture(id, amount, opts)
+      def call({:capture, id, amount}, opts, state) do
+        capture(id, amount, opts, state)
           |> handle_response
       end
-      def call({:purchase, amount, card}, opts) do
-        purchase(amount, card, opts)
+      def call({:purchase, amount, card}, opts, state) do
+        purchase(amount, card, opts, state)
           |> handle_response
       end
-      def call({:refund, id}, opts) do
-        refund(id, opts)
+      def call({:refund, id}, opts, state) do
+        refund(id, opts, state)
           |> handle_response
       end
-      def call({:store, card}, opts) do
-        store(card, opts)
+      def call({:store, card}, opts, state) do
+        store(card, opts, state)
           |> handle_response
       end
-      def call({:unstore, id}, opts) do
-        unstore(id, opts)
+      def call({:unstore, id}, opts, state) do
+        unstore(id, opts, state)
           |> handle_response
       end
-      def call({:void, id}, opts) do
-        void(id, opts)
+      def call({:void, id}, opts, state) do
+        void(id, opts, state)
           |> handle_response
       end
 
@@ -49,35 +52,38 @@ defmodule Cashier.Gateways.Base do
       #   do: {:stop, :normal, {:error, :unknown_response}}
 
       # overridable functions
-      def authorize(amount, card, opts),
+      def init(state), do: {:ok, state}
+
+      def authorize(amount, card, opts, state),
         do: :not_implemented
 
-      def capture(id, amount, opts),
+      def capture(id, amount, opts, state),
         do: :not_implemented
       
-      def purchase(amount, card, opts),
+      def purchase(amount, card, opts, state),
         do: :not_implemented
 
-      def refund(id, opts),
+      def refund(id, opts, state),
         do: :not_implemented
 
-      def store(card, opts),
+      def store(card, opts, state),
         do: :not_implemented
 
-      def unstore(id, opts),
+      def unstore(id, opts, state),
         do: :not_implemented
 
-      def void(id, opts),
+      def void(id, opts, state),
         do: :not_implemented
 
       defoverridable [
-        authorize: 3,
-        capture: 3,
-        purchase: 3,
-        refund: 2,
-        store: 2,
-        unstore: 2,
-        void: 2
+        init: 1,
+        authorize: 4,
+        capture: 4,
+        purchase: 4,
+        refund: 3,
+        store: 3,
+        unstore: 3,
+        void: 3
       ]
     end
   end
