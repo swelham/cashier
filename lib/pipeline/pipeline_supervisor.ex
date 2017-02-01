@@ -3,7 +3,7 @@ defmodule Cashier.Pipeline.PipelineSupervisor do
 
   @gateways [
     dummy: Cashier.Gateways.Dummy.Supervisor,
-    #{:paypal, Cashier.Gateways.PayPal}
+    paypal: Cashier.Gateways.PayPal.Supervisor
   ]
 
   def start_link,

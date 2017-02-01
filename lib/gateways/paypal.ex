@@ -1,5 +1,9 @@
 defmodule Cashier.Gateways.PayPal do
-  use Cashier.Gateways.Base, name: :paypal
+  use Cashier.Gateways.BaseSupervisor,
+    module: __MODULE__,
+    name: :paypal
+
+  use Cashier.Gateways.Base
 
   alias Cashier.HttpRequest
   alias Cashier.Address
