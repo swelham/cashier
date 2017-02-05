@@ -69,6 +69,23 @@ defmodule Cashier.Gateways.PayPalTest do
     refute Process.alive?(pid)
   end
 
+  test "all requests should return decoded error results", %{config: config, bypass: bypass} do
+    Bypass.expect bypass, fn conn ->
+      Plug.Conn.send_resp(conn, 400, "{\"error\": \"message\"}")
+    end
+
+    err_result = %{"error" => "message"}
+    opts = default_opts ++ [billing_address: address]
+
+    {:error, :invalid, ^err_result} = Gateway.authorize(9.75, payment_card, opts, config)
+    {:error, :invalid, ^err_result} = Gateway.capture("1234", 9.75, opts, config)
+    {:error, :invalid, ^err_result} = Gateway.purchase(9.75, payment_card, opts, config)
+    {:error, :invalid, ^err_result} = Gateway.refund("1234", opts, config)
+    {:error, :invalid, ^err_result} = Gateway.store(payment_card, opts, config)
+    {:error, :invalid, ^err_result} = Gateway.unstore("CARD-123", [], config)
+    {:error, :invalid, ^err_result} = Gateway.void("1234", [], config)
+  end
+
   test "authorize/4 should successfully process a credit card authorization request", %{config: config, bypass: bypass} do
     expected_response = "{\"id\":\"PAY-123\"}"
 
@@ -284,16 +301,16 @@ defmodule Cashier.Gateways.PayPalTest do
   end
 
   test "unstore/3 should successfully process a credit card unstore request", %{config: config, bypass: bypass} do
-      Bypass.expect bypass, fn conn ->
-        assert "DELETE" == conn.method
-        assert "/v1/vault/credit-cards/CARD-123" == conn.request_path
-        assert has_header(conn, {"authorization", "bearer some.token"})
+    Bypass.expect bypass, fn conn ->
+      assert "DELETE" == conn.method
+      assert "/v1/vault/credit-cards/CARD-123" == conn.request_path
+      assert has_header(conn, {"authorization", "bearer some.token"})
 
-        Plug.Conn.send_resp(conn, 204, "")
-      end
-
-      {:ok, {:paypal, nil}} = Gateway.unstore("CARD-123", [], config)
+      Plug.Conn.send_resp(conn, 204, "")
     end
+
+    {:ok, {:paypal, nil}} = Gateway.unstore("CARD-123", [], config)
+  end
 
   test "void/3 should successfully process a void authorization request", %{config: config, bypass: bypass} do
     expected_response = "{\"id\":\"5678\"}"
