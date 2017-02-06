@@ -32,7 +32,7 @@ defmodule Cashier.Mixfile do
   defp deps do
     [
       {:poison, "~> 3.0"},
-      {:httpoison, "~> 0.10.0"},
+      {:httpoison, "~> 0.11.0"},
 
       # dev deps
       {:ex_doc, ">= 0.14.0", only: :dev},
