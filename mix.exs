@@ -3,7 +3,7 @@ defmodule Cashier.Mixfile do
 
   def project do
     [app: :cashier,
-     version: "0.2.0",
+     version: "0.3.0",
      elixir: "~> 1.3",
      description: description(),
      package: package(),
@@ -32,7 +32,7 @@ defmodule Cashier.Mixfile do
   defp deps do
     [
       {:poison, "~> 3.0"},
-      {:httpoison, "~> 0.10.0"},
+      {:httpoison, "~> 0.11.0"},
       {:gen_stage, "~> 0.11.0"},
 
       # dev deps
