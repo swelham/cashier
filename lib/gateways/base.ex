@@ -41,6 +41,8 @@ defmodule Cashier.Gateways.Base do
         do: {:reply, response, state}
       def handle_response({:ok, _, _} = response, state),
         do: {:reply, response, state}
+      def handle_response({:error, _, _} = response, state),
+        do: {:reply, response, state}
       def handle_response({:stop, reason}, state),
         do: {:stop, :normal, reason, state}
       def handle_response(_, _, state),
