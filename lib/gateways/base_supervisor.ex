@@ -17,7 +17,7 @@ defmodule Cashier.Gateways.BaseSupervisor do
             name: __MODULE__,
             subscribe_to: [{
               Cashier.Pipeline.GatewayRouter,
-              max_demand: 50, # todo: max_demand needs to be a config option
+              max_demand: default_config[:max_gateway_workers] || 50,
               selector: &dispatch_selector/1
             }]
           )
@@ -29,6 +29,13 @@ defmodule Cashier.Gateways.BaseSupervisor do
 
         defp gateway_config,
           do: Application.get_env(:cashier, unquote(opts[:name]), nil)
+
+        defp default_config do
+          case Application.get_env(:cashier, :cashier) do
+            nil -> []
+            config -> config[:defaults]
+          end
+        end
       end
     end
   end

@@ -42,15 +42,6 @@ defmodule Cashier.Gateways.Base do
       # todo: need to look into the error cases here and how to handle them
       def handle_response(response), do: response
 
-      # def handle_response({:ok, _} = response),
-      #   do: {:reply, response}
-      # def handle_response({:ok, _, _} = response),
-      #   do: {:reply, response}
-      # def handle_response({:stop, reason}),
-      #   do: {:stop, :normal, reason}
-      # def handle_response(_, _),
-      #   do: {:stop, :normal, {:error, :unknown_response}}
-
       # overridable functions
       def init(state), do: {:ok, state}
 
