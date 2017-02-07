@@ -4,12 +4,6 @@
 
 Cashier is an Elixir library that aims to be an easy to use payment gateway, whilst offering the fault tolerance and scalability benefits of being built on top of Erlang/OTP
 
-# Project Status
-
-This is a new project and currently working towards implementating it's first payment gateway (PayPal).
-The long term goal is to offer support for a wide range of payment gateways whilst maintaining an
-easy to use public API and configuration.
-
 # Usage
 
 The following are basic usage examples on how to use cashier in it's current state. This library is being activily developed and is likely to 
