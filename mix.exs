@@ -4,7 +4,7 @@ defmodule Cashier.Mixfile do
   def project do
     [app: :cashier,
      version: "0.3.0",
-     elixir: "~> 1.3",
+     elixir: "~> 1.4",
      description: description(),
      package: package(),
      build_embedded: Mix.env == :prod,
@@ -16,7 +16,7 @@ defmodule Cashier.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :httpoison],
+    [applications: [:logger, :httpoison, :hackney],
      mod: {Cashier, []}]
   end
 
