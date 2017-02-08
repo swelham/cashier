@@ -16,7 +16,7 @@ defmodule Cashier.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :httpoison, :hackney],
+    [applications: [:logger, :httpoison],
      mod: {Cashier, []}]
   end
 
