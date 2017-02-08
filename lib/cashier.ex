@@ -6,43 +6,43 @@ defmodule Cashier do
   end
 
   def authorize(amount, card),
-    do: authorize(amount, card, default_opts)
+    do: authorize(amount, card, default_opts())
 
   def authorize(amount, card, opts),
     do: call(opts, {:authorize, amount, card})
 
   def capture(id, amount),
-    do: capture(id, amount, default_opts)
+    do: capture(id, amount, default_opts())
 
   def capture(id, amount, opts),
     do: call(opts, {:capture, id, amount})
 
   def purchase(amount, card),
-    do: purchase(amount, card, default_opts)
+    do: purchase(amount, card, default_opts())
 
   def purchase(amount, card, opts),
     do: call(opts, {:purchase, amount, card})
   
   def refund(id),
-    do: refund(id, default_opts)
+    do: refund(id, default_opts())
 
   def refund(id, opts),
     do: call(opts, {:refund, id})
   
   def store(card),
-    do: store(card, default_opts)
+    do: store(card, default_opts())
 
   def store(card, opts),
     do: call(opts, {:store, card})
 
   def unstore(id),
-    do: unstore(id, default_opts)
+    do: unstore(id, default_opts())
 
   def unstore(id, opts),
     do: call(opts, {:unstore, id})
 
   def void(id),
-    do: void(id, default_opts)
+    do: void(id, default_opts())
 
   def void(id, opts),
     do: call(opts, {:void, id})
@@ -65,7 +65,7 @@ defmodule Cashier do
     do: Keyword.get(opts, :gateway)
 
   defp merge_default_opts(opts),
-    do: Keyword.merge(default_opts, opts)
+    do: Keyword.merge(default_opts(), opts)
 
   defp default_opts do
     [
@@ -82,7 +82,7 @@ defmodule Cashier do
   end
 
   defp gateway_timeout(gateway),
-    do: Application.get_env(:cashier, gateway)[:timeout] || default_timeout
+    do: Application.get_env(:cashier, gateway)[:timeout] || default_timeout()
 
   defp default_timeout,
     do: get_default(:timeout) || 5000
