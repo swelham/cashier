@@ -5,9 +5,9 @@ defmodule Cashier.PayPalFixtures do
       intent: "authorize",
       payer: %{
         payment_method: "credit_card",
-        funding_instruments: funding_instruments
+        funding_instruments: funding_instruments()
       },
-      transactions: transactions
+      transactions: transactions()
     }
   end
 
@@ -16,9 +16,9 @@ defmodule Cashier.PayPalFixtures do
       intent: "authorize",
       payer: %{
         payment_method: "credit_card",
-        funding_instruments: funding_instruments_stored_card
+        funding_instruments: funding_instruments_stored_card()
       },
-      transactions: transactions
+      transactions: transactions()
     }
   end
 
@@ -55,9 +55,9 @@ defmodule Cashier.PayPalFixtures do
       intent: "sale",
       payer: %{
         payment_method: "credit_card",
-        funding_instruments: funding_instruments
+        funding_instruments: funding_instruments()
       },
-      transactions: transactions
+      transactions: transactions()
     }
   end
 
@@ -66,14 +66,14 @@ defmodule Cashier.PayPalFixtures do
       intent: "sale",
       payer: %{
         payment_method: "credit_card",
-        funding_instruments: funding_instruments_stored_card
+        funding_instruments: funding_instruments_stored_card()
       },
-      transactions: transactions
+      transactions: transactions()
     }
   end
 
   def store_request do
-    credit_card
+    credit_card()
       |> Map.put(:external_customer_id, "CUST-1")
       |> Poison.encode!
   end
@@ -97,7 +97,7 @@ defmodule Cashier.PayPalFixtures do
   def funding_instruments do
     [
       %{
-        credit_card: credit_card
+        credit_card: credit_card()
       }
     ]
   end
