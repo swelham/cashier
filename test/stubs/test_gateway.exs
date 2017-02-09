@@ -1,4 +1,8 @@
-defmodule Cashier.TestGateway do
+defmodule Cashier.Gateways.Test do
+  use Cashier.Gateways.BaseSupervisor,
+    module: __MODULE__,
+    name: :test
+    
   use Cashier.Gateways.Base
 
   def authorize(_, _, _, _),
@@ -12,7 +16,7 @@ defmodule Cashier.TestGateway do
 
   def refund(_, _, _),
     do: respond("refund")
-  
+
   def store(_, _, _),
     do: respond("store")
 

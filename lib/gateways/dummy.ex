@@ -1,5 +1,9 @@
 defmodule Cashier.Gateways.Dummy do
-  use Cashier.Gateways.Base, name: :dummy
+  use Cashier.Gateways.BaseSupervisor,
+    module: __MODULE__,
+    name: :dummy
+
+  use Cashier.Gateways.Base
 
   def authorize(_, _, _, _),
     do: respond("authorize")

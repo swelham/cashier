@@ -2,19 +2,14 @@ defmodule CashierTest do
   use ExUnit.Case
   doctest Cashier
 
-  setup do
-    {:ok, pid} = Cashier.TestGateway.start_link
-    {:ok, %{gateway: pid}}
-  end
-
   test "authorize/2 should call into default gateway" do
     result = Cashier.authorize(0, nil)
 
     assert result == {:ok, "authorize_id", {:dummy, "raw_data"}}
   end
 
-  test "authorize/3 should call into a specified gateway", %{gateway: gateway} do
-    result = Cashier.authorize(0, nil, [gateway: gateway])
+  test "authorize/3 should call into a specified gateway" do
+    result = Cashier.authorize(0, nil, [gateway: :test])
 
     assert result == {:ok, "authorize_id", {:test, "raw_data"}}
   end
@@ -25,8 +20,8 @@ defmodule CashierTest do
     assert result == {:ok, "capture_id", {:dummy, "raw_data"}}
   end
 
-  test "capture/3 should call into a specified gateway", %{gateway: gateway} do
-    result = Cashier.capture(nil, 0, [gateway: gateway])
+  test "capture/3 should call into a specified gateway" do
+    result = Cashier.capture(nil, 0, [gateway: :test])
     
     assert result ==  {:ok, "capture_id", {:test, "raw_data"}}
   end
@@ -37,8 +32,8 @@ defmodule CashierTest do
     assert result == {:ok, "purchase_id", {:dummy, "raw_data"}}
   end
 
-  test "purchase/3 should call into a specified gateway", %{gateway: gateway} do
-    result = Cashier.purchase(0, nil, [gateway: gateway])
+  test "purchase/3 should call into a specified gateway" do
+    result = Cashier.purchase(0, nil, [gateway: :test])
 
     assert result == {:ok, "purchase_id", {:test, "raw_data"}}
   end
@@ -49,8 +44,8 @@ defmodule CashierTest do
     assert result == {:ok, "refund_id", {:dummy, "raw_data"}}
   end
 
-  test "refund/2 should call into a specified gateway", %{gateway: gateway} do
-    result = Cashier.refund(0, [gateway: gateway])
+  test "refund/2 should call into a specified gateway" do
+    result = Cashier.refund(0, [gateway: :test])
 
     assert result == {:ok, "refund_id", {:test, "raw_data"}}
   end
@@ -61,8 +56,8 @@ defmodule CashierTest do
     assert result == {:ok, "store_id", {:dummy, "raw_data"}}
   end
 
-  test "store/2 should call into a specified gateway", %{gateway: gateway} do
-    result = Cashier.store(nil, [gateway: gateway])
+  test "store/2 should call into a specified gateway" do
+    result = Cashier.store(nil, [gateway: :test])
 
     assert result == {:ok, "store_id", {:test, "raw_data"}}
   end
@@ -73,8 +68,8 @@ defmodule CashierTest do
     assert result == {:ok, {:dummy, "raw_data"}}
   end
 
-  test "unstore/2 should call into a specified gateway", %{gateway: gateway} do
-    result = Cashier.unstore(nil, [gateway: gateway])
+  test "unstore/2 should call into a specified gateway" do
+    result = Cashier.unstore(nil, [gateway: :test])
 
     assert result == {:ok, {:test, "raw_data"}}
   end
@@ -85,8 +80,8 @@ defmodule CashierTest do
     assert result == {:ok, "void_id", {:dummy, "raw_data"}}
   end
 
-  test "void/2 should call into a specified gateway", %{gateway: gateway} do
-    result = Cashier.void("", [gateway: gateway])
+  test "void/2 should call into a specified gateway" do
+    result = Cashier.void("", [gateway: :test])
 
     assert result == {:ok, "void_id", {:test, "raw_data"}}
   end
