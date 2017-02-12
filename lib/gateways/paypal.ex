@@ -120,14 +120,17 @@ defmodule Cashier.Gateways.PayPal do
     {:ok, response["id"], {:paypal, body}}
   end
 
+  defp respond({:ok, %{status_code: 400, body: body}}) do
+    errors = body
+      |> Poison.decode!
+      |> Map.get("details", [])
+      |> map_field_errors
+
+    {:error, :invalid, errors}
+  end
+
   defp respond({:ok, %{status_code: 401}}),
     do: {:stop, {:error, :unauthorized}}
-
-  defp respond({:ok, %{status_code: status_code, body: body}}) when status_code == 400 do
-    {:ok, response} = Poison.decode(body)
-
-    {:error, :invalid, response}
-  end
 
   defp respond({:ok, %{status_code: status_code, body: body}}),
     do: {:error, unexpected_status_error(status_code, body)}
@@ -144,6 +147,31 @@ defmodule Cashier.Gateways.PayPal do
   # TODO: improve error reporting
   defp unexpected_status_error(status_code, action),
     do: "Unexpected status code (#{status_code}) returned #{action}"
+
+  defp map_field_errors(errors),
+    do: map_field_errors(errors, [])
+  defp map_field_errors([], acc),
+    do: acc
+  defp map_field_errors([error | rest], acc),
+    do: map_field_error(error, rest, acc)
+
+  defp map_field_error(%{"field" => field, "issue" => message}, errors, acc) do
+    acc = [map_error(field, message)] ++ acc
+    
+    map_field_errors(errors, acc)
+  end
+
+  defp map_error(field, message) do
+    {parts, _} = 
+      String.split(field, ".")
+      |> Enum.reverse
+      |> Enum.split(2)
+
+    key = hd(parts)
+    type = parts |> tl |> hd
+
+    {type, key, message}
+  end
 
   defp put_intent(map, :sale),
     do: Map.put(map, :intent, "sale")

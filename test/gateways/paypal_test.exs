@@ -41,40 +41,13 @@ defmodule Cashier.Gateways.PayPalTest do
     assert result[:access_token] == "some_token"
   end
 
-  # test "init/1 should stop the process when an unexpected status code is returned", %{config: config, bypass: bypass} do
-  #   Bypass.expect bypass, fn conn ->
-  #     Plug.Conn.send_resp(conn, 201, "")
-  #   end
-
-  #   config = Keyword.delete(config, :access_token)
-  #   {:stop, result} = Gateway.init(config)
-
-  #   assert result == "Unexpected status code (201) returned requesting the PayPal access_token"
-  # end
-
-  # test "the process should stop when an unauthorized status code is returned", %{config: config, bypass: bypass} do
-  #   Bypass.expect bypass, fn conn ->
-  #     case conn.request_path do
-  #       "/v1/oauth2/token" ->
-  #         Plug.Conn.send_resp(conn, 200, "{\"access_token\": \"some_token\"}")
-  #       _ ->
-  #         Plug.Conn.send_resp(conn, 401, "")
-  #     end
-  #   end
-
-  #   {:ok, pid} = GenServer.start_link(Cashier.Gateways.PayPal, config)
-
-  #   {:error, :unauthorized} = GenServer.call(pid, {:void, "", []})
-
-  #   refute Process.alive?(pid)
-  # end
-
   test "all requests should return decoded error results", %{config: config, bypass: bypass} do
     Bypass.expect bypass, fn conn ->
-      Plug.Conn.send_resp(conn, 400, "{\"error\": \"message\"}")
+      Plug.Conn.send_resp(conn, 400,
+        "{ \"details\": [{\"field\": \"payer.funding_instruments[0].credit_card.number\",\"issue\":\"Value must not be blank\"}]}")
     end
 
-    err_result = %{"error" => "message"}
+    err_result = [{ "credit_card", "number", "Value must not be blank" }]
     opts = default_opts() ++ [billing_address: address()]
 
     {:error, :invalid, ^err_result} = Gateway.authorize(9.75, payment_card(), opts, config)
