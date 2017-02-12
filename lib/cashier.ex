@@ -63,14 +63,6 @@ defmodule Cashier do
     end
   end
 
-  defp call_gateway(nil, _args),
-    do: {:error, "A payment gateway was not specified"}
-  defp call_gateway(gateway, args),
-    do: GenServer.call(gateway, args, gateway_timeout(gateway))
-
-  defp resolve_gateway(opts),
-    do: Keyword.get(opts, :gateway)
-
   defp merge_default_opts(opts),
     do: Keyword.merge(default_opts(), opts)
 
@@ -87,9 +79,6 @@ defmodule Cashier do
       defaults -> defaults[key]
     end
   end
-
-  defp merge_default_opts(opts),
-    do: Keyword.merge(default_opts, opts)
 
   defp merge_gateway_timeout(opts),
     do: Keyword.put(opts, :timeout, gateway_timeout(opts[:gateway]))

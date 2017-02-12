@@ -13,7 +13,7 @@ defmodule Cashier.Pipeline.PipelineSupervisor do
     children = [
       worker(Cashier.Pipeline.GatewayProducer, []),
       worker(Cashier.Pipeline.GatewayRouter, [])
-    ] ++ get_gateway_supervisors
+    ] ++ get_gateway_supervisors()
 
     supervise(children, strategy: :one_for_one)
   end

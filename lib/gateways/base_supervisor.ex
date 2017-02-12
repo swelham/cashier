@@ -8,7 +8,7 @@ defmodule Cashier.Gateways.BaseSupervisor do
 
         def start_link(_opts) do
           children = [
-            worker(unquote(opts[:module]), [gateway_config], restart: :temporary)
+            worker(unquote(opts[:module]), [gateway_config()], restart: :temporary)
           ]
 
           ConsumerSupervisor.start_link(
@@ -17,7 +17,7 @@ defmodule Cashier.Gateways.BaseSupervisor do
             name: __MODULE__,
             subscribe_to: [{
               Cashier.Pipeline.GatewayRouter,
-              max_demand: default_config[:max_gateway_workers] || 50,
+              max_demand: default_config()[:max_gateway_workers] || 50,
               selector: &dispatch_selector/1
             }]
           )
