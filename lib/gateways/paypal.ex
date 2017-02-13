@@ -167,10 +167,9 @@ defmodule Cashier.Gateways.PayPal do
       |> Enum.reverse
       |> Enum.split(2)
 
-    key = hd(parts)
-    type = parts |> tl |> hd
+    [key | type] = parts
 
-    {type, key, message}
+    {hd(type), key, message}
   end
 
   defp put_intent(map, :sale),
