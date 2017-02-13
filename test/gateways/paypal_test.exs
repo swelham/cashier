@@ -64,13 +64,13 @@ defmodule Cashier.Gateways.PayPalTest do
 
     opts = default_opts() ++ [billing_address: address()]
 
-    {:error, :invalid, ^err_result} = Gateway.authorize(9.75, payment_card(), opts, config)
-    {:error, :invalid, ^err_result} = Gateway.capture("1234", 9.75, opts, config)
-    {:error, :invalid, ^err_result} = Gateway.purchase(9.75, payment_card(), opts, config)
-    {:error, :invalid, ^err_result} = Gateway.refund("1234", opts, config)
-    {:error, :invalid, ^err_result} = Gateway.store(payment_card(), opts, config)
-    {:error, :invalid, ^err_result} = Gateway.unstore("CARD-123", [], config)
-    {:error, :invalid, ^err_result} = Gateway.void("1234", [], config)
+    assert {:error, :invalid, err_result} == Gateway.authorize(9.75, payment_card(), opts, config)
+    assert {:error, :invalid, err_result} == Gateway.capture("1234", 9.75, opts, config)
+    assert {:error, :invalid, err_result} == Gateway.purchase(9.75, payment_card(), opts, config)
+    assert {:error, :invalid, err_result} == Gateway.refund("1234", opts, config)
+    assert {:error, :invalid, err_result} == Gateway.store(payment_card(), opts, config)
+    assert {:error, :invalid, err_result} == Gateway.unstore("CARD-123", [], config)
+    assert {:error, :invalid, err_result} == Gateway.void("1234", [], config)
   end
 
   test "authorize/4 should successfully process a credit card authorization request", %{config: config, bypass: bypass} do
