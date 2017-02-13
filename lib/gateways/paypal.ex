@@ -9,6 +9,15 @@ defmodule Cashier.Gateways.PayPal do
   alias Cashier.Address
   alias Cashier.PaymentCard
 
+  @error_map %{
+    "type" => "brand",
+    "cvv2" => "cvv",
+    "last_name" => "holder",
+    "first_name" => "holder",
+    "expire_year" => "expiry",
+    "expire_month" => "expiry",
+  }
+
   def init(state) do
     # todo: access_token caching
     body = %{grant_type: "client_credentials"}
@@ -169,8 +178,11 @@ defmodule Cashier.Gateways.PayPal do
 
     [key | type] = parts
 
-    {hd(type), key, message}
+    {hd(type), error_key_name(key), message}
   end
+
+  defp error_key_name(key),
+    do: Map.get(@error_map, key, key)
 
   defp put_intent(map, :sale),
     do: Map.put(map, :intent, "sale")

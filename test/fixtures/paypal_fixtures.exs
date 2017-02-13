@@ -1,4 +1,23 @@
 defmodule Cashier.PayPalFixtures do
+  def error_response do
+    Poison.encode! %{
+      details: [
+        %{field: "payer.funding_instruments[0].credit_card.number", issue: "credit_card.number error"},
+        %{field: "payer.funding_instruments[0].credit_card.type", issue: "credit_card.type error"},
+        %{field: "payer.funding_instruments[0].credit_card.expire_month", issue: "credit_card.expire_month error"},
+        %{field: "payer.funding_instruments[0].credit_card.expire_year", issue: "credit_card.expire_year error"},
+        %{field: "payer.funding_instruments[0].credit_card.cvv2", issue: "credit_card.cvv2 error"},
+        %{field: "payer.funding_instruments[0].credit_card.first_name", issue: "credit_card.first_name error"},
+        %{field: "payer.funding_instruments[0].credit_card.last_name", issue: "credit_card.last_name error"},
+        %{field: "payer.funding_instruments[0].billing_address.line1", issue: "billing_address.line1 error"},
+        %{field: "payer.funding_instruments[0].billing_address.line2", issue: "billing_address.line2 error"},
+        %{field: "payer.funding_instruments[0].billing_address.city", issue: "billing_address.city error"},
+        %{field: "payer.funding_instruments[0].billing_address.country_code", issue: "billing_address.country_code error"},
+        %{field: "payer.funding_instruments[0].billing_address.postal_code", issue: "billing_address.postal_code error"},
+        %{field: "payer.funding_instruments[0].billing_address.state", issue: "billing_address.state error"}
+      ]
+    }
+  end
 
   def authorize_request do
     Poison.encode! %{

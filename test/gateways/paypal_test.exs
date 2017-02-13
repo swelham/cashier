@@ -43,11 +43,25 @@ defmodule Cashier.Gateways.PayPalTest do
 
   test "all requests should return decoded error results", %{config: config, bypass: bypass} do
     Bypass.expect bypass, fn conn ->
-      Plug.Conn.send_resp(conn, 400,
-        "{ \"details\": [{\"field\": \"payer.funding_instruments[0].credit_card.number\",\"issue\":\"Value must not be blank\"}]}")
+      Plug.Conn.send_resp(conn, 400, Fixtures.error_response)
     end
 
-    err_result = [{ "credit_card", "number", "Value must not be blank" }]
+    err_result = [
+      {"billing_address", "state",        "billing_address.state error"},
+      {"billing_address", "postal_code",  "billing_address.postal_code error"},
+      {"billing_address", "country_code", "billing_address.country_code error"},
+      {"billing_address", "city",         "billing_address.city error"},
+      {"billing_address", "line2",        "billing_address.line2 error"},
+      {"billing_address", "line1",        "billing_address.line1 error"},
+      {"credit_card",     "holder",       "credit_card.last_name error"},
+      {"credit_card",     "holder",       "credit_card.first_name error"},
+      {"credit_card",     "cvv",          "credit_card.cvv2 error"},
+      {"credit_card",     "expiry",       "credit_card.expire_year error"},
+      {"credit_card",     "expiry",       "credit_card.expire_month error"},
+      {"credit_card",     "brand",        "credit_card.type error"},
+      {"credit_card",     "number",       "credit_card.number error"}
+    ]
+
     opts = default_opts() ++ [billing_address: address()]
 
     {:error, :invalid, ^err_result} = Gateway.authorize(9.75, payment_card(), opts, config)
