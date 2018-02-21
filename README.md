@@ -1,6 +1,7 @@
 # Cashier
 
 [![Build Status](https://travis-ci.org/swelham/cashier.svg?branch=master)](https://travis-ci.org/swelham/cashier) [![Deps Status](https://beta.hexfaktor.org/badge/all/github/swelham/cashier.svg?branch=master)](https://beta.hexfaktor.org/github/swelham/cashier) [![Hex Version](https://img.shields.io/hexpm/v/cashier.svg)](https://hex.pm/packages/cashier) [![Join the chat at https://gitter.im/swelham/cashier](https://badges.gitter.im/swelham/cashier.svg)](https://gitter.im/swelham/cashier?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Open Source Helpers](https://www.codetriage.com/swelham/cashier/badges/users.svg)](https://www.codetriage.com/swelham/cashier)
 
 Cashier is an Elixir library that aims to be an easy to use payment gateway, whilst offering the fault tolerance and scalability benefits of being built on top of Erlang/OTP
 
